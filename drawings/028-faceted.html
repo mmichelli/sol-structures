@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 028</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#028 &mdash; Complex Form</h1>
+  <p>An irregular solid assembled from angular facets. White painted, the form resists easy reading &mdash; neither cube nor sphere, but something between.</p>
+  <p class="source">After Sol LeWitt &mdash; <em>Complex Forms</em>, late 1980s</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene } from './scene.js';
+import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
+import * as THREE from 'three';
+import { run } from './runner.js';
+
+function randomBlob(s, count, radius, irregularity) {
+  const points = [];
+  for (let i = 0; i < count; i++) {
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const r = radius * (1 + (Math.random() - 0.5) * irregularity);
+    points.push(new THREE.Vector3(
+      r * Math.sin(phi) * Math.cos(theta),
+      r * Math.sin(phi) * Math.sin(theta) + radius,
+      r * Math.cos(phi),
+    ));
+  }
+  const geo = new ConvexGeometry(points);
+  geo.computeVertexNormals();
+  const mesh = new THREE.Mesh(geo, s.whiteMat);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  s.scene.add(mesh);
+  return mesh;
+}
+
+function randomCrystal(s, ox, oy, oz, height, baseRadius, facets) {
+  const points = [];
+  // Base ring
+  for (let i = 0; i < facets; i++) {
+    const a = (i / facets) * Math.PI * 2;
+    const r = baseRadius * (0.7 + Math.random() * 0.6);
+    points.push(new THREE.Vector3(ox + Math.cos(a) * r, oy, oz + Math.sin(a) * r));
+  }
+  // Mid ring
+  for (let i = 0; i < facets; i++) {
+    const a = (i / facets) * Math.PI * 2 + Math.PI / facets;
+    const r = baseRadius * (0.5 + Math.random() * 0.8);
+    const h = height * (0.3 + Math.random() * 0.4);
+    points.push(new THREE.Vector3(ox + Math.cos(a) * r, oy + h, oz + Math.sin(a) * r));
+  }
+  // Apex
+  points.push(new THREE.Vector3(ox + (Math.random()-0.5)*0.5, oy + height, oz + (Math.random()-0.5)*0.5));
+  // Bottom
+  points.push(new THREE.Vector3(ox, oy - 0.1, oz));
+
+  const geo = new ConvexGeometry(points);
+  geo.computeVertexNormals();
+  const mesh = new THREE.Mesh(geo, s.whiteMat);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  s.scene.add(mesh);
+}
+
+run([
+  { strategy: null, draw: container => {
+    const s = createScene(container, {
+      distance: 35, angle: 35, pitch: 20, lookY: 2.5, lookAt: [0, 2.5, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    randomBlob(s, 30, 3, 0.6);
+  }},
+  { strategy: "Three forms in conversation", draw: container => {
+    const s = createScene(container, {
+      distance: 45, angle: 35, pitch: 22, lookY: 2, lookAt: [0, 2, 0],
+      groundSize: 25, bg: 0xffffff,
+    });
+    randomBlob(s, 20, 2, 0.5).position.set(-4, 0, 0);
+    randomBlob(s, 25, 2.5, 0.7).position.set(2, 0, 1);
+    randomBlob(s, 15, 1.5, 0.4).position.set(0, 0, -3);
+  }},
+  { strategy: "Crystalline", draw: container => {
+    const s = createScene(container, {
+      distance: 40, angle: 40, pitch: 25, lookY: 2, lookAt: [0, 2, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    const count = 3 + Math.floor(Math.random() * 4);
+    for (let i = 0; i < count; i++) {
+      const x = (Math.random() - 0.5) * 8;
+      const z = (Math.random() - 0.5) * 8;
+      randomCrystal(s, x, 0, z, 2 + Math.random() * 4, 1 + Math.random(), 5 + Math.floor(Math.random() * 4));
+    }
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

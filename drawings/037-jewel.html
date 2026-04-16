@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 037</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#037 &mdash; Jewel</h1>
+  <p>A large transparent icosahedron enclosing a small coloured cube. The faceted shell refracts light; the solid core anchors it. Precious geometry.</p>
+  <p class="source">After Sol LeWitt &mdash; enclosed forms</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene, THREE } from './scene.js';
+import { run } from './runner.js';
+
+function jewel(scene, outerGeo, outerColor, innerGeo, innerColor, outerOpacity) {
+  const outerMat = new THREE.MeshPhysicalMaterial({
+    color: outerColor, transparent: true, opacity: outerOpacity,
+    roughness: 0.05, metalness: 0.1, transmission: 0.5,
+    side: THREE.DoubleSide, depthWrite: false,
+  });
+  const outer = new THREE.Mesh(outerGeo, outerMat);
+  outer.position.set(0, 3.5, 0);
+  outer.castShadow = true;
+  scene.add(outer);
+
+  const innerMat = new THREE.MeshStandardMaterial({
+    color: innerColor, roughness: 0.3, metalness: 0.1,
+  });
+  const inner = new THREE.Mesh(innerGeo, innerMat);
+  inner.position.set(0, 3.5, 0);
+  inner.castShadow = true;
+  scene.add(inner);
+}
+
+run([
+  { strategy: null, draw: container => {
+    const ctx = createScene(container, {
+      distance: 22, angle: 30, pitch: 20, lookAt: [0, 3.5, 0],
+      groundSize: 15, bg: 0xffffff,
+    });
+    jewel(ctx.scene,
+      new THREE.IcosahedronGeometry(3.5, 0), 0xaaccff,
+      new THREE.BoxGeometry(1.5, 1.5, 1.5), 0xcc2222, 0.2);
+  }},
+  { strategy: "Dodecahedron shell, sphere core", draw: container => {
+    const ctx = createScene(container, {
+      distance: 22, angle: 40, pitch: 22, lookAt: [0, 3.5, 0],
+      groundSize: 15, bg: 0xffffff,
+    });
+    jewel(ctx.scene,
+      new THREE.DodecahedronGeometry(3.5, 0), 0xffccaa,
+      new THREE.SphereGeometry(1.2, 32, 32), 0x2244cc, 0.22);
+  }},
+  { strategy: "Octahedron and octahedron", draw: container => {
+    const ctx = createScene(container, {
+      distance: 22, angle: 35, pitch: 25, lookAt: [0, 3.5, 0],
+      groundSize: 15, bg: 0xffffff,
+    });
+    jewel(ctx.scene,
+      new THREE.OctahedronGeometry(3.5, 0), 0xccffcc,
+      new THREE.OctahedronGeometry(1.2, 0), 0x8822cc, 0.2);
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

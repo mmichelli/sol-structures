@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 029</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#029 &mdash; Splotch</h1>
+  <p>A lumpy organic mass &mdash; a sphere distorted by noise, its surface buckled into ridges and valleys. The geometry of accident.</p>
+  <p class="source">After Sol LeWitt &mdash; <em>Splotch</em> series, 2000s</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene } from './scene.js';
+import * as THREE from 'three';
+import { run } from './runner.js';
+
+// Simple 3D noise approximation
+function noise3d(x, y, z) {
+  const n = Math.sin(x * 1.7 + y * 2.3) * Math.cos(z * 1.9 + x * 0.7) +
+            Math.sin(y * 3.1 + z * 1.1) * Math.cos(x * 2.7) * 0.5 +
+            Math.sin(z * 4.3 + x * 0.3 + y * 1.9) * 0.25;
+  return n;
+}
+
+function splotch(s, radius, detail, amplitude, seed) {
+  const geo = new THREE.IcosahedronGeometry(radius, detail);
+  const pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+    const len = Math.sqrt(x*x + y*y + z*z);
+    const nx = x/len, ny = y/len, nz = z/len;
+    const displacement = noise3d(nx * 3 + seed, ny * 3 + seed, nz * 3 + seed) * amplitude;
+    const newLen = radius + displacement;
+    pos.setXYZ(i, nx * newLen, ny * newLen + radius, nz * newLen);
+  }
+  geo.computeVertexNormals();
+  const mesh = new THREE.Mesh(geo, s.whiteMat);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  s.scene.add(mesh);
+  return mesh;
+}
+
+run([
+  { strategy: null, draw: container => {
+    const s = createScene(container, {
+      distance: 30, angle: 35, pitch: 20, lookY: 3, lookAt: [0, 3, 0],
+      groundSize: 16, bg: 0xffffff,
+    });
+    splotch(s, 3, 4, 1.2, Math.random() * 100);
+  }},
+  { strategy: "Cluster", draw: container => {
+    const s = createScene(container, {
+      distance: 45, angle: 35, pitch: 22, lookY: 2, lookAt: [0, 2, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    for (let i = 0; i < 5; i++) {
+      const m = splotch(s, 1 + Math.random() * 1.5, 3, 0.6, Math.random() * 100);
+      m.position.set((Math.random()-0.5)*8, 0, (Math.random()-0.5)*8);
+    }
+  }},
+  { strategy: "Smooth and monumental", draw: container => {
+    const s = createScene(container, {
+      distance: 35, angle: 30, pitch: 15, lookY: 3, lookAt: [0, 3, 0],
+      groundSize: 16, bg: 0xffffff,
+    });
+    splotch(s, 3.5, 5, 0.5, Math.random() * 100);
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

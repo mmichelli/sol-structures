@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 022</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="card">
+  <h1>#022 &mdash; Sensor</h1>
+  <p>A grid of points, each point a short vertical mark. The density varies: sparse at the edges, packed at the centre. From a distance, a tone emerges.</p>
+  <p class="source">Seed &mdash; <em>Sony Ericsson K800i</em>: a 3.2-megapixel camera sensor, a grid of light-sensitive points.</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { isoSVG } from './iso.js';
+import { run } from './runner.js';
+
+run([
+  { strategy: null, draw: container => {
+    const iso = isoSVG({ scale: 20, stroke: '#333', strokeWidth: 0.8 });
+    const N = 16;
+    const cx = N/2, cz = N/2;
+    for (let x = 0; x < N; x++)
+      for (let z = 0; z < N; z++) {
+        const dx = x - cx, dz = z - cz;
+        const dist = Math.sqrt(dx*dx + dz*dz);
+        const h = Math.max(0.1, 1.5 - dist * 0.15);
+        if (Math.random() < 0.9 - dist * 0.05)
+          iso.addLine(x * 0.6, 0, z * 0.6, x * 0.6, h, z * 0.6);
+      }
+    iso.render(container);
+  }},
+  { strategy: "Cluster the edges", draw: container => {
+    const iso = isoSVG({ scale: 22, stroke: '#333', strokeWidth: 0.7 });
+    const N = 12;
+    for (let x = 0; x < N; x++)
+      for (let z = 0; z < N; z++) {
+        const h = 0.2 + (x / N) * 1.5;
+        iso.addLine(x * 0.7, 0, z * 0.7, x * 0.7, h, z * 0.7);
+      }
+    iso.render(container);
+  }},
+  { strategy: "Ghost echoes", draw: container => {
+    const iso = isoSVG({ scale: 18, stroke: '#333', strokeWidth: 0.6 });
+    const N = 20;
+    for (let x = 0; x < N; x++)
+      for (let z = 0; z < N; z++) {
+        const h = 0.3 + Math.random() * 1.2;
+        const op = 0.2 + Math.random() * 0.8;
+        iso.addLine(x * 0.5, 0, z * 0.5, x * 0.5, h, z * 0.5, { stroke: '#333', opacity: op });
+      }
+    iso.render(container);
+  }},
+]);
+</script>
+</body>
+</html>

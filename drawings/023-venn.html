@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 023</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="card">
+  <h1>#023 &mdash; Overlap</h1>
+  <p>Three open rectangular forms overlapping in space. Where two forms share a region, the lines double. Where all three meet, the lines triple.</p>
+  <p class="source">Seed &mdash; <em>Literature of Bosnia and Herzegovina</em>: multiple cultural traditions composing a singular literature.</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { isoSVG } from './iso.js';
+import { run } from './runner.js';
+
+run([
+  { strategy: null, draw: container => {
+    const iso = isoSVG({ scale: 30, strokeWidth: 1.2 });
+    iso.addOpenBox(-3, 0, -2, 5, 4, 4, { stroke: '#c03030' });
+    iso.addOpenBox(-1, 0, -1, 5, 3, 4, { stroke: '#3060c0' });
+    iso.addOpenBox(-2, 0, 0, 5, 5, 4, { stroke: '#222' });
+    iso.render(container);
+  }},
+  { strategy: "Simple subtraction", draw: container => {
+    const iso = isoSVG({ scale: 30, strokeWidth: 1.2 });
+    // Two forms, one inside the other
+    iso.addOpenBox(-3, 0, -3, 6, 6, 6, { stroke: '#333' });
+    iso.addOpenBox(-1, 0, -1, 2, 3, 2, { stroke: '#c03030' });
+    iso.render(container);
+  }},
+  { strategy: "Cascades", draw: container => {
+    const iso = isoSVG({ scale: 22, strokeWidth: 0.9 });
+    // Five overlapping boxes stepping diagonally
+    for (let i = 0; i < 5; i++) {
+      const grey = Math.round(60 + i * 40);
+      iso.addOpenBox(i * 1.5, 0, i * 1.5, 4, 3 + i * 0.5, 4, { stroke: `rgb(${grey},${grey},${grey})` });
+    }
+    iso.render(container);
+  }},
+]);
+</script>
+</body>
+</html>

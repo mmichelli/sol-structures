@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 026</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="card">
+  <h1>#026 &mdash; Radial</h1>
+  <p>Open cubes arranged in concentric rings around a centre point. The cubes grow larger with each ring; the outermost barely visible, the innermost dense and tall.</p>
+  <p class="source">Seed &mdash; <em>16th IIFA Awards</em>: the radial symmetry of an auditorium, a trophy at the centre.</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { isoSVG } from './iso.js';
+import { run } from './runner.js';
+
+run([
+  { strategy: null, draw: container => {
+    const iso = isoSVG({ scale: 16, stroke: '#333', strokeWidth: 0.8 });
+    // Centre cube — tall
+    iso.addOpenBox(-0.4, 0, -0.4, 0.8, 3, 0.8);
+    // Concentric rings, cubes shrink outward
+    for (let ring = 1; ring <= 4; ring++) {
+      const N = ring * 5;
+      const r = ring * 2.2;
+      const cubeSize = 1.4 - ring * 0.2;
+      const height = 2.5 - ring * 0.4;
+      for (let i = 0; i < N; i++) {
+        const angle = (i / N) * Math.PI * 2;
+        const x = Math.cos(angle) * r;
+        const z = Math.sin(angle) * r;
+        iso.addOpenBox(x - cubeSize/2, 0, z - cubeSize/2, cubeSize, height, cubeSize);
+      }
+    }
+    iso.render(container);
+  }},
+  { strategy: "Rising outward", draw: container => {
+    const iso = isoSVG({ scale: 14, stroke: '#333', strokeWidth: 0.7 });
+    // Opposite: cubes grow taller outward
+    for (let ring = 1; ring <= 5; ring++) {
+      const N = ring * 4;
+      const r = ring * 2;
+      const cubeSize = 0.6 + ring * 0.15;
+      const height = ring * 0.8;
+      for (let i = 0; i < N; i++) {
+        const angle = (i / N) * Math.PI * 2 + ring * 0.1;
+        const x = Math.cos(angle) * r;
+        const z = Math.sin(angle) * r;
+        iso.addOpenBox(x - cubeSize/2, 0, z - cubeSize/2, cubeSize, height, cubeSize);
+      }
+    }
+    iso.render(container);
+  }},
+  { strategy: "Use fewer notes", draw: container => {
+    const iso = isoSVG({ scale: 22, stroke: '#333', strokeWidth: 1.2 });
+    // Just 3 cubes at 120 degrees, different heights
+    iso.addOpenBox(-0.5, 0, -0.5, 1, 4, 1);
+    for (let i = 0; i < 3; i++) {
+      const angle = (i / 3) * Math.PI * 2;
+      const r = 4;
+      const x = Math.cos(angle) * r;
+      const z = Math.sin(angle) * r;
+      const h = 1 + i;
+      iso.addOpenBox(x - 0.7, 0, z - 0.7, 1.4, h, 1.4);
+    }
+    iso.render(container);
+  }},
+]);
+</script>
+</body>
+</html>

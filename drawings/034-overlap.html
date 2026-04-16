@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 034</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#034 &mdash; Overlap</h1>
+  <p>Three large transparent slabs &mdash; red, blue, yellow &mdash; intersecting at angles. Where two overlap the colours mix; where all three meet, a dark core forms.</p>
+  <p class="source">After Sol LeWitt &mdash; colour and form intersections</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene, THREE } from './scene.js';
+import { run } from './runner.js';
+
+function slab(scene, sx, sy, sz, pos, rot, color) {
+  const mat = new THREE.MeshStandardMaterial({
+    color, transparent: true, opacity: 0.35,
+    roughness: 0.2, metalness: 0, depthWrite: false,
+    side: THREE.DoubleSide,
+  });
+  const geo = new THREE.BoxGeometry(sx, sy, sz);
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(...pos);
+  if (rot) mesh.rotation.set(...rot);
+  mesh.castShadow = true;
+  scene.add(mesh);
+}
+
+run([
+  { strategy: null, draw: container => {
+    const ctx = createScene(container, {
+      distance: 28, angle: 35, pitch: 25, lookAt: [0, 3, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    slab(ctx.scene, 8, 6, 1.5, [0, 3, 0], null, 0xcc2222);
+    slab(ctx.scene, 1.5, 6, 8, [0, 3, 0], null, 0x2244cc);
+    slab(ctx.scene, 8, 1.5, 8, [0, 3, 0], null, 0xccaa00);
+  }},
+  { strategy: "Tilted planes", draw: container => {
+    const ctx = createScene(container, {
+      distance: 30, angle: 40, pitch: 20, lookAt: [0, 3, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    slab(ctx.scene, 8, 6, 0.8, [0, 3, 0], [0, 0, 0.3], 0xcc2222);
+    slab(ctx.scene, 0.8, 6, 8, [0, 3, 0], [0.3, 0, 0], 0x2244cc);
+    slab(ctx.scene, 8, 0.8, 8, [0, 3, 0], [0, 0.3, 0], 0xccaa00);
+  }},
+  { strategy: "Six thin sheets", draw: container => {
+    const ctx = createScene(container, {
+      distance: 30, angle: 30, pitch: 25, lookAt: [0, 3, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    const colors = [0xcc2222, 0xcc7700, 0xccaa00, 0x22aa44, 0x2244cc, 0x8822cc];
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI;
+      slab(ctx.scene, 7, 5, 0.4, [0, 2.5, 0], [0, a, 0], colors[i]);
+    }
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

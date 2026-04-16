@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 019</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="card">
+  <h1>#019 &mdash; Tunnel</h1>
+  <p>Two mirrored open forms joined at a central axis by a single line. Bilateral symmetry &mdash; the structure cannot exist without both halves.</p>
+  <p class="source">Seed &mdash; <em>Treaty of Canterbury (1986)</em>: the agreement that authorized construction of the Channel Tunnel.</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { isoSVG } from './iso.js';
+import { run } from './runner.js';
+
+run([
+  { strategy: null, draw: container => {
+    const iso = isoSVG({ scale: 25, stroke: '#333', strokeWidth: 1.2 });
+    // Two open cubes joined by a bar
+    iso.addOpenCube(-5, 0, -1.5, 3);
+    iso.addOpenCube(2, 0, -1.5, 3);
+    // Connecting tunnel
+    iso.addLine(-2, 1.5, 0, 2, 1.5, 0, { stroke: '#333', strokeWidth: 1.2 });
+    iso.addLine(-2, 0, 0, 2, 0, 0, { stroke: '#333', strokeWidth: 1.2 });
+    iso.addLine(-2, 0, 0, -2, 1.5, 0, { stroke: '#999', strokeWidth: 0.6 });
+    iso.addLine(2, 0, 0, 2, 1.5, 0, { stroke: '#999', strokeWidth: 0.6 });
+    iso.render(container);
+  }},
+  { strategy: "Repetition is a form of change", draw: container => {
+    const iso = isoSVG({ scale: 18, stroke: '#333', strokeWidth: 1 });
+    // Chain of cubes connected
+    for (let i = 0; i < 5; i++) {
+      iso.addOpenCube(i * 4, 0, 0, 2);
+      if (i < 4) {
+        iso.addLine(i*4+2, 1, 1, i*4+4, 1, 1);
+        iso.addLine(i*4+2, 0, 1, i*4+4, 0, 1);
+      }
+    }
+    iso.render(container);
+  }},
+  { strategy: "Water", draw: container => {
+    const iso = isoSVG({ scale: 20, stroke: '#333', strokeWidth: 0.8 });
+    // Wavy connecting lines between two forms
+    iso.addOpenBox(-6, 0, -2, 3, 4, 4);
+    iso.addOpenBox(3, 0, -2, 3, 4, 4);
+    const steps = 12;
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      const x = -3 + t * 6;
+      const y = 2 + Math.sin(t * Math.PI * 3) * 0.8;
+      if (i < steps) {
+        const t2 = (i+1)/steps;
+        const x2 = -3 + t2 * 6;
+        const y2 = 2 + Math.sin(t2 * Math.PI * 3) * 0.8;
+        iso.addLine(x, y, 0, x2, y2, 0);
+      }
+    }
+    iso.render(container);
+  }},
+]);
+</script>
+</body>
+</html>

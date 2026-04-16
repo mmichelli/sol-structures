@@ -68,7 +68,7 @@ export function createScene(container, opts = {}) {
     const groundSize = opts.groundSize || 30;
     const ground = new THREE.Mesh(
       new THREE.PlaneGeometry(groundSize, groundSize),
-      new THREE.ShadowMaterial({ opacity: 0.06 }),
+      new THREE.ShadowMaterial({ opacity: 0.15 }),
     );
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = opts.groundY || 0;
@@ -86,7 +86,7 @@ export function createScene(container, opts = {}) {
   // Materials
   // Painted aluminum — warm off-white, distinct from background
   const whiteMat = new THREE.MeshStandardMaterial({
-    color: opts.matColor || 0x888480,
+    color: opts.matColor || 0x909090,
     roughness: 0.6,
     metalness: 0,
   });

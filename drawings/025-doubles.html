@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 025</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="card">
+  <h1>#025 &mdash; Doubles</h1>
+  <p>An open rectangular court divided by precise internal lines. Everything is mirrored: each form on the left has its twin on the right.</p>
+  <p class="source">Seed &mdash; <em>2025 Rio Open Doubles</em>: a tennis court with its precise internal grid, the concept of doubles as mirrored pairs.</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { isoSVG } from './iso.js';
+import { run } from './runner.js';
+
+run([
+  { strategy: null, draw: container => {
+    const iso = isoSVG({ scale: 24, stroke: '#333', strokeWidth: 1 });
+    // Court outline
+    iso.addOpenBox(-5, 0, -3, 10, 0.05, 6);
+    // Centre line
+    iso.addLine(0, 0.05, -3, 0, 0.05, 3, { stroke: '#999', strokeWidth: 0.5 });
+    // Mirrored forms
+    iso.addOpenCube(-4, 0, -1, 2);
+    iso.addOpenCube(2, 0, -1, 2);
+    iso.addOpenBox(-3.5, 0, 1, 1, 3, 1);
+    iso.addOpenBox(2.5, 0, 1, 1, 3, 1);
+    iso.render(container);
+  }},
+  { strategy: "Break the symmetry", draw: container => {
+    const iso = isoSVG({ scale: 24, stroke: '#333', strokeWidth: 1 });
+    iso.addOpenBox(-5, 0, -3, 10, 0.05, 6);
+    iso.addLine(0, 0.05, -3, 0, 0.05, 3, { stroke: '#999', strokeWidth: 0.5 });
+    // Left side: tall narrow
+    iso.addOpenBox(-4, 0, -1, 1, 4, 2);
+    // Right side: wide short
+    iso.addOpenBox(1, 0, -1, 3, 1.5, 2);
+    iso.render(container);
+  }},
+  { strategy: "Repetition is a form of change", draw: container => {
+    const iso = isoSVG({ scale: 18, stroke: '#333', strokeWidth: 0.8 });
+    // Many mirrored pairs
+    for (let i = 0; i < 5; i++) {
+      const y = 0, z = i * 2.5 - 5;
+      const h = 1 + Math.random() * 2;
+      iso.addOpenBox(-4, y, z, 1.5, h, 1.5);
+      iso.addOpenBox(2.5, y, z, 1.5, h, 1.5);
+    }
+    iso.addLine(0, 0, -6, 0, 0, 7.5, { stroke: '#999', strokeWidth: 0.4 });
+    iso.render(container);
+  }},
+]);
+</script>
+</body>
+</html>

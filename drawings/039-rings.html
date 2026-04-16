@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 039</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#039 &mdash; Rings</h1>
+  <p>Five concentric torus rings, each tilted at a different angle and a different transparent colour. An armillary sphere made of candy glass.</p>
+  <p class="source">After Sol LeWitt &mdash; circles and arcs in space</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene, THREE } from './scene.js';
+import { run } from './runner.js';
+
+function rings(scene, count, baseRadius, tube, colors, alphas) {
+  for (let i = 0; i < count; i++) {
+    const r = baseRadius + i * 0.3;
+    const geo = new THREE.TorusGeometry(r, tube, 24, 64);
+    const mat = new THREE.MeshStandardMaterial({
+      color: colors[i % colors.length],
+      transparent: true, opacity: alphas[i % alphas.length],
+      roughness: 0.2, metalness: 0.05, depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(0, 3.5, 0);
+    // Each ring tilted differently
+    const angle = (i / count) * Math.PI;
+    mesh.rotation.set(angle, i * 0.4, 0);
+    mesh.castShadow = true;
+    scene.add(mesh);
+  }
+}
+
+run([
+  { strategy: null, draw: container => {
+    const ctx = createScene(container, {
+      distance: 24, angle: 30, pitch: 20, lookAt: [0, 3.5, 0],
+      groundSize: 15, bg: 0xffffff,
+    });
+    rings(ctx.scene, 5, 2.5, 0.15,
+      [0xcc2222, 0xcc7700, 0xccaa00, 0x22aa44, 0x2244cc],
+      [0.5, 0.45, 0.4, 0.45, 0.5]);
+  }},
+  { strategy: "Fat rings, fewer", draw: container => {
+    const ctx = createScene(container, {
+      distance: 24, angle: 40, pitch: 25, lookAt: [0, 3.5, 0],
+      groundSize: 15, bg: 0xffffff,
+    });
+    rings(ctx.scene, 3, 2.5, 0.4,
+      [0xcc2222, 0x2244cc, 0xccaa00],
+      [0.4, 0.35, 0.4]);
+  }},
+  { strategy: "Seven rings, pastel", draw: container => {
+    const ctx = createScene(container, {
+      distance: 28, angle: 35, pitch: 22, lookAt: [0, 3.5, 0],
+      groundSize: 15, bg: 0xffffff,
+    });
+    rings(ctx.scene, 7, 2, 0.12,
+      [0xffaaaa, 0xffccaa, 0xffffaa, 0xaaffcc, 0xaaccff, 0xddaaff, 0xffaadd],
+      [0.5, 0.45, 0.5, 0.45, 0.5, 0.45, 0.5]);
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

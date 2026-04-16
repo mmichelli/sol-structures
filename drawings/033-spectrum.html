@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 033</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#033 &mdash; Spectrum</h1>
+  <p>Twelve cubes in a row, each a different hue stepping around the colour wheel. Semi-transparent &mdash; the row reads as a gradient dissolving into the ground plane.</p>
+  <p class="source">After Sol LeWitt &mdash; colour studies</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene, THREE } from './scene.js';
+import { run } from './runner.js';
+
+function hsl(h, s, l) {
+  return new THREE.Color().setHSL(h, s, l);
+}
+
+run([
+  { strategy: null, draw: container => {
+    const ctx = createScene(container, {
+      distance: 38, angle: 25, pitch: 18, lookAt: [0, 1, 0],
+      groundSize: 30, bg: 0xffffff,
+    });
+    const N = 12, sp = 2.4, size = 1.8;
+    const offset = -(N - 1) * sp / 2;
+    for (let i = 0; i < N; i++) {
+      const mat = new THREE.MeshStandardMaterial({
+        color: hsl(i / N, 0.7, 0.5),
+        transparent: true, opacity: 0.55,
+        roughness: 0.3, metalness: 0, depthWrite: false,
+      });
+      const geo = new THREE.BoxGeometry(size, size, size);
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(offset + i * sp, size / 2, 0);
+      mesh.castShadow = true;
+      ctx.scene.add(mesh);
+    }
+  }},
+  { strategy: "Stack instead of row", draw: container => {
+    const ctx = createScene(container, {
+      distance: 40, angle: 30, pitch: 15, lookAt: [0, 8, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    const N = 12, size = 1.6;
+    for (let i = 0; i < N; i++) {
+      const mat = new THREE.MeshStandardMaterial({
+        color: hsl(i / N, 0.7, 0.5),
+        transparent: true, opacity: 0.5,
+        roughness: 0.3, depthWrite: false,
+      });
+      const geo = new THREE.BoxGeometry(size, size, size);
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(0, size / 2 + i * size * 1.1, 0);
+      mesh.castShadow = true;
+      ctx.scene.add(mesh);
+    }
+  }},
+  { strategy: "Circle of colour", draw: container => {
+    const ctx = createScene(container, {
+      distance: 32, angle: 35, pitch: 30, lookAt: [0, 1, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    const N = 12, R = 6, size = 1.5;
+    for (let i = 0; i < N; i++) {
+      const a = (i / N) * Math.PI * 2;
+      const mat = new THREE.MeshStandardMaterial({
+        color: hsl(i / N, 0.7, 0.5),
+        transparent: true, opacity: 0.5,
+        roughness: 0.3, depthWrite: false,
+      });
+      const geo = new THREE.BoxGeometry(size, size, size);
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(Math.cos(a) * R, size / 2, Math.sin(a) * R);
+      mesh.castShadow = true;
+      ctx.scene.add(mesh);
+    }
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

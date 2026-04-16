@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 018</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="card">
+  <h1>#018 &mdash; Tussock</h1>
+  <p>Dense clusters of vertical bars radiating from base points, repeated across a field. Thin, tightly packed parallel forms like a sedge meadow rendered in geometry.</p>
+  <p class="source">Seed &mdash; <em>Carex angustisquama</em>: a tussock-forming perennial sedge native to northern Honshu.</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { isoSVG } from './iso.js';
+import { run } from './runner.js';
+
+function tussock(iso, cx, cz, count, height, spread) {
+  for (let i = 0; i < count; i++) {
+    const angle = (i / count) * Math.PI * 2 + Math.random() * 0.3;
+    const r = Math.random() * spread;
+    const x = cx + Math.cos(angle) * r;
+    const z = cz + Math.sin(angle) * r;
+    const h = height * (0.5 + Math.random() * 0.5);
+    iso.addLine(x, 0, z, x + (Math.random()-0.5)*0.1, h, z + (Math.random()-0.5)*0.1);
+  }
+}
+
+run([
+  { strategy: null, draw: container => {
+    const iso = isoSVG({ scale: 30, stroke: '#444', strokeWidth: 0.8 });
+    for (let i = 0; i < 7; i++) {
+      const cx = (Math.random()-0.5) * 10;
+      const cz = (Math.random()-0.5) * 10;
+      tussock(iso, cx, cz, 20 + Math.floor(Math.random()*15), 2 + Math.random()*3, 0.8);
+    }
+    iso.render(container);
+  }},
+  { strategy: "Use fewer notes", draw: container => {
+    const iso = isoSVG({ scale: 40, stroke: '#444', strokeWidth: 1 });
+    tussock(iso, 0, 0, 40, 4, 1.5);
+    iso.render(container);
+  }},
+  { strategy: "Emphasize the flaws", draw: container => {
+    const iso = isoSVG({ scale: 25, stroke: '#444', strokeWidth: 0.6 });
+    for (let i = 0; i < 15; i++) {
+      const cx = (Math.random()-0.5) * 14;
+      const cz = (Math.random()-0.5) * 14;
+      tussock(iso, cx, cz, 8 + Math.floor(Math.random()*20), 1 + Math.random()*5, 0.5 + Math.random());
+    }
+    iso.render(container);
+  }},
+]);
+</script>
+</body>
+</html>

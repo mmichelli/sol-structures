@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 040</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#040 &mdash; Column</h1>
+  <p>A tall column of stacked transparent discs, alternating between two colours. Light passes through each layer, tinting the one below. A lighthouse lens.</p>
+  <p class="source">After Sol LeWitt &mdash; vertical stacking and colour</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene, THREE } from './scene.js';
+import { run } from './runner.js';
+
+function column(scene, count, radius, thickness, gap, colors, alpha) {
+  for (let i = 0; i < count; i++) {
+    const geo = new THREE.CylinderGeometry(radius, radius, thickness, 32);
+    const mat = new THREE.MeshStandardMaterial({
+      color: colors[i % colors.length],
+      transparent: true, opacity: alpha,
+      roughness: 0.2, metalness: 0, depthWrite: false,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(0, i * (thickness + gap) + thickness / 2, 0);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    scene.add(mesh);
+  }
+}
+
+run([
+  { strategy: null, draw: container => {
+    const ctx = createScene(container, {
+      distance: 32, angle: 25, pitch: 15, lookAt: [0, 6, 0],
+      groundSize: 15, bg: 0xffffff,
+    });
+    column(ctx.scene, 20, 1.8, 0.5, 0.1, [0xcc2222, 0x2244cc], 0.45);
+  }},
+  { strategy: "Three-colour cycle", draw: container => {
+    const ctx = createScene(container, {
+      distance: 32, angle: 35, pitch: 18, lookAt: [0, 6, 0],
+      groundSize: 15, bg: 0xffffff,
+    });
+    column(ctx.scene, 18, 1.8, 0.6, 0.08, [0xcc2222, 0xccaa00, 0x2244cc], 0.4);
+  }},
+  { strategy: "Shrinking radius", draw: container => {
+    const ctx = createScene(container, {
+      distance: 30, angle: 30, pitch: 18, lookAt: [0, 6, 0],
+      groundSize: 15, bg: 0xffffff,
+    });
+    const N = 24;
+    const colors = [0xcc2222, 0x2244cc];
+    for (let i = 0; i < N; i++) {
+      const r = 2.5 - i * 0.08;
+      const t = 0.4;
+      const geo = new THREE.CylinderGeometry(r, r, t, 32);
+      const mat = new THREE.MeshStandardMaterial({
+        color: colors[i % 2],
+        transparent: true, opacity: 0.4,
+        roughness: 0.2, depthWrite: false,
+      });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(0, i * (t + 0.06) + t / 2, 0);
+      mesh.castShadow = true;
+      ctx.scene.add(mesh);
+    }
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

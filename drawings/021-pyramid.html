@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 021</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#021 &mdash; Four-Sided Pyramid</h1>
+  <p>A stepped pyramid of concrete blocks. Each layer shrinks inward, rising to an apex. The form is ancient; the system is modern.</p>
+  <p class="source">Seed &mdash; <em>IIFA Awards</em>: a ceremony with a radial stage, rows of seats as concentric arcs.</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene, THREE } from './scene.js';
+import { run } from './runner.js';
+
+const palette = [0xcc2222, 0xcc6622, 0xccaa00, 0x44aa33, 0x2266cc, 0x5533bb, 0xaa2288, 0x22aaaa];
+
+function layerMat(i, layers) {
+  const t = i / (layers - 1);
+  return new THREE.MeshStandardMaterial({
+    color: palette[i % palette.length],
+    transparent: true, opacity: 0.3 + t * 0.5,
+    roughness: 0.3, metalness: 0, depthWrite: false,
+    side: THREE.DoubleSide,
+  });
+}
+
+run([
+  { strategy: null, draw: container => {
+    const s = createScene(container, {
+      distance: 40, angle: 40, pitch: 30, lookAt: [0, 2, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    const layers = 8;
+    for (let i = 0; i < layers; i++) {
+      const size = (layers - i) * 1.2;
+      s.addClosedBox(-size/2, i * 0.5, -size/2, size, 0.5, size, layerMat(i, layers));
+    }
+  }},
+  { strategy: "Turn it upside down", draw: container => {
+    const s = createScene(container, {
+      distance: 40, angle: 40, pitch: 30, lookAt: [0, 3, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    const layers = 8;
+    for (let i = 0; i < layers; i++) {
+      const size = (i + 1) * 1.2;
+      s.addClosedBox(-size/2, i * 0.5, -size/2, size, 0.5, size, layerMat(i, layers));
+    }
+  }},
+  { strategy: "Destroy — nothing — destroy", draw: container => {
+    const s = createScene(container, {
+      distance: 40, angle: 40, pitch: 30, lookAt: [0, 2, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    const layers = 8;
+    for (let i = 0; i < layers; i++) {
+      const size = (layers - i) * 1.2;
+      s.addClosedBox(-size/2, i * 0.5, -size/2, size, 0.5, size, layerMat(i, layers));
+    }
+    s.scene.children.forEach(c => {
+      if (c.isMesh && c.position.x > 0 && c.position.z > 0 && c.position.y > 1) {
+        c.visible = false;
+      }
+    });
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

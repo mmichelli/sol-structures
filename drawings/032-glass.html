@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 032</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#032 &mdash; Glass Nesting</h1>
+  <p>Three concentric cubes of coloured glass &mdash; red, blue, yellow. Each layer visible through the next. Where colours overlap, new hues emerge.</p>
+  <p class="source">After Sol LeWitt &mdash; nested open cubes with colour</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene } from './scene.js';
+import { run } from './runner.js';
+
+function glassMat(color, opacity) {
+  return new THREE.MeshPhysicalMaterial({
+    color, transparent: true, opacity,
+    roughness: 0.1, metalness: 0, transmission: 0.6,
+    side: THREE.DoubleSide, depthWrite: false,
+  });
+}
+
+import { THREE } from './scene.js';
+
+function addGlassBox(scene, x, y, z, s, mat) {
+  const geo = new THREE.BoxGeometry(s, s, s);
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(x, y + s/2, z);
+  mesh.castShadow = true;
+  scene.add(mesh);
+}
+
+run([
+  { strategy: null, draw: container => {
+    const ctx = createScene(container, {
+      distance: 28, angle: 35, pitch: 25, lookAt: [0, 3, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    const s = ctx.scene;
+    addGlassBox(s, 0, 0, 0, 6, glassMat(0xcc2222, 0.25));
+    addGlassBox(s, 0, 0, 0, 4, glassMat(0x2244cc, 0.3));
+    addGlassBox(s, 0, 0, 0, 2, glassMat(0xccaa00, 0.4));
+  }},
+  { strategy: "Offset each shell", draw: container => {
+    const ctx = createScene(container, {
+      distance: 30, angle: 40, pitch: 20, lookAt: [0, 3, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    const s = ctx.scene;
+    addGlassBox(s, -1, 0, -1, 6, glassMat(0xcc2222, 0.25));
+    addGlassBox(s, 0.5, 0, 0.5, 4, glassMat(0x2244cc, 0.3));
+    addGlassBox(s, 1, 0, 1, 2, glassMat(0xccaa00, 0.4));
+  }},
+  { strategy: "Five layers, five colours", draw: container => {
+    const ctx = createScene(container, {
+      distance: 35, angle: 30, pitch: 25, lookAt: [0, 4, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    const s = ctx.scene;
+    const colors = [0xcc2222, 0xcc7700, 0xccaa00, 0x22aa44, 0x2244cc];
+    for (let i = 0; i < 5; i++) {
+      addGlassBox(s, 0, 0, 0, 8 - i * 1.5, glassMat(colors[i], 0.2));
+    }
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

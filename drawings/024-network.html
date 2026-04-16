@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 024</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#024 &mdash; Network</h1>
+  <p>Open cubes scattered across a ground plane. Each cube is connected to its nearest neighbour by a bar &mdash; the same material, the same weight. The network is the structure.</p>
+  <p class="source">Seed &mdash; <em>Globemaster Air Cargo</em>: flight routes as connected line segments across a map.</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene } from './scene.js';
+import { run } from './runner.js';
+
+function dist(a, b) { return Math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2); }
+
+function scatter(count, spread, maxH) {
+  return Array.from({length: count}, () => [
+    (Math.random()-0.5) * spread,
+    0,
+    (Math.random()-0.5) * spread,
+    0.6 + Math.random() * maxH,  // cube size
+  ]);
+}
+
+function buildNetwork(s, pts, bar, connectAll) {
+  // Place cubes
+  for (const [x, y, z, size] of pts) {
+    s.addOpenCube(x - size/2, y, z - size/2, size, bar);
+  }
+
+  // Connect each to nearest neighbour with a bar at mid-height
+  const centres = pts.map(([x, y, z, size]) => [x, y + size/2, z]);
+  const connected = new Set();
+
+  for (let i = 0; i < pts.length; i++) {
+    let best = -1, bestD = Infinity;
+    for (let j = 0; j < pts.length; j++) {
+      if (i === j) continue;
+      const d = dist(centres[i], centres[j]);
+      if (d < bestD) { bestD = d; best = j; }
+    }
+    if (best >= 0) {
+      const key = Math.min(i, best) + ',' + Math.max(i, best);
+      if (!connected.has(key)) {
+        connected.add(key);
+        s.addBar(
+          centres[i][0], centres[i][1], centres[i][2],
+          centres[best][0], centres[best][1], centres[best][2],
+          bar
+        );
+      }
+    }
+    // Also connect second nearest if requested
+    if (connectAll) {
+      let second = -1, secondD = Infinity;
+      for (let j = 0; j < pts.length; j++) {
+        if (i === j || j === best) continue;
+        const d = dist(centres[i], centres[j]);
+        if (d < secondD) { secondD = d; second = j; }
+      }
+      if (second >= 0) {
+        const key = Math.min(i, second) + ',' + Math.max(i, second);
+        if (!connected.has(key)) {
+          connected.add(key);
+          s.addBar(
+            centres[i][0], centres[i][1], centres[i][2],
+            centres[second][0], centres[second][1], centres[second][2],
+            bar * 0.7
+          );
+        }
+      }
+    }
+  }
+}
+
+run([
+  { strategy: null, draw: container => {
+    const s = createScene(container, {
+      distance: 50, angle: 38, pitch: 30, lookY: 1.5, lookAt: [0, 1.5, 0],
+      groundSize: 30, bg: 0xffffff,
+    });
+    buildNetwork(s, scatter(12, 16, 2), 0.06, true);
+  }},
+  { strategy: "Dense cluster", draw: container => {
+    const s = createScene(container, {
+      distance: 40, angle: 35, pitch: 28, lookY: 2, lookAt: [0, 2, 0],
+      groundSize: 25, bg: 0xffffff,
+    });
+    buildNetwork(s, scatter(20, 10, 3), 0.05, true);
+  }},
+  { strategy: "Only one element of each kind", draw: container => {
+    const s = createScene(container, {
+      distance: 35, angle: 40, pitch: 22, lookY: 1.5, lookAt: [0, 1.5, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    // Just two cubes, one bar
+    const pts = [[-4, 0, 0, 2], [4, 0, 0, 1.5]];
+    s.addOpenCube(-4 - 1, 0, -1, 2, 0.06);
+    s.addOpenCube(4 - 0.75, 0, -0.75, 1.5, 0.06);
+    s.addBar(-4, 1, 0, 4, 0.75, 0, 0.06);
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

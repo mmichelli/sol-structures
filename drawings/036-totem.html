@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 036</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#036 &mdash; Totem</h1>
+  <p>A vertical stack of five different geometric solids &mdash; cube, sphere, cylinder, cone, torus &mdash; each a bold primary colour. A vocabulary of form.</p>
+  <p class="source">After Sol LeWitt &mdash; geometric forms and colour</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene, THREE } from './scene.js';
+import { run } from './runner.js';
+
+function mat(color, alpha) {
+  return new THREE.MeshStandardMaterial({
+    color, transparent: alpha < 1, opacity: alpha,
+    roughness: 0.35, metalness: 0,
+    depthWrite: alpha >= 1,
+  });
+}
+
+const shapes = [
+  (s) => new THREE.BoxGeometry(s, s, s),
+  (s) => new THREE.SphereGeometry(s/2, 32, 32),
+  (s) => new THREE.CylinderGeometry(s/2, s/2, s, 32),
+  (s) => new THREE.ConeGeometry(s/2, s, 32),
+  (s) => new THREE.TorusGeometry(s/3, s/6, 16, 32),
+];
+
+function totem(scene, size, gap, colors, alphas, order) {
+  let y = 0;
+  for (let i = 0; i < order.length; i++) {
+    const geo = shapes[order[i]](size);
+    const mesh = new THREE.Mesh(geo, mat(colors[i % colors.length], alphas[i % alphas.length]));
+    mesh.position.set(0, y + size / 2, 0);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    scene.add(mesh);
+    y += size + gap;
+  }
+}
+
+run([
+  { strategy: null, draw: container => {
+    const ctx = createScene(container, {
+      distance: 30, angle: 30, pitch: 18, lookAt: [0, 5, 0],
+      groundSize: 15, bg: 0xffffff,
+    });
+    totem(ctx.scene, 2, 0.4,
+      [0xcc2222, 0x2244cc, 0xccaa00, 0x22aa44, 0x222222],
+      [1, 1, 1, 1, 1],
+      [0, 1, 2, 3, 4]);
+  }},
+  { strategy: "Translucent stack", draw: container => {
+    const ctx = createScene(container, {
+      distance: 30, angle: 35, pitch: 20, lookAt: [0, 5, 0],
+      groundSize: 15, bg: 0xffffff,
+    });
+    totem(ctx.scene, 2, 0.4,
+      [0xcc2222, 0x2244cc, 0xccaa00, 0x22aa44, 0x8822cc],
+      [0.7, 0.5, 0.6, 0.4, 0.5],
+      [0, 1, 2, 3, 4]);
+  }},
+  { strategy: "Shuffle the order", draw: container => {
+    const ctx = createScene(container, {
+      distance: 30, angle: 40, pitch: 22, lookAt: [0, 5, 0],
+      groundSize: 15, bg: 0xffffff,
+    });
+    const order = [4, 2, 0, 3, 1];
+    totem(ctx.scene, 2, 0.4,
+      [0x8822cc, 0xccaa00, 0xcc2222, 0x22aa44, 0x2244cc],
+      [0.8, 0.6, 0.9, 0.5, 0.7],
+      order);
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 027</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#027 &mdash; Lineage</h1>
+  <p>A branching tree of open cubes. From one cube at the base, two arms rise upward, each carrying a smaller cube; from each of those, two more. Three generations built from bars alone &mdash; no lines, only structure.</p>
+  <p class="source">Seed &mdash; <em>Tran Trong Vu</em>: a painter, son of a poet, married to a writer. Familial lineage as a branching tree.</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene } from './scene.js';
+import { run } from './runner.js';
+
+const t = 0.06;
+
+function tree(s, x, y, z, depth, maxDepth, spread) {
+  const cubeSize = 1.4 - depth * 0.3;
+  const half = cubeSize / 2;
+  s.addOpenBox(x - half, y, z - half, cubeSize, cubeSize, cubeSize, t);
+
+  if (depth >= maxDepth) return;
+
+  const rise = 2.2 - depth * 0.3;
+  const dx = spread * Math.pow(0.55, depth);
+
+  // Left arm — bar from top of this cube to bottom of next
+  const lx = x - dx;
+  const ly = y + cubeSize + rise;
+  s.addBar(x, y + cubeSize, z, lx, ly, z, t);
+  tree(s, lx, ly, z, depth + 1, maxDepth, spread);
+
+  // Right arm
+  const rx = x + dx;
+  const ry = ly;
+  s.addBar(x, y + cubeSize, z, rx, ry, z, t);
+  tree(s, rx, ry, z, depth + 1, maxDepth, spread);
+}
+
+function tree3way(s, x, y, z, depth, maxDepth, spread) {
+  const cubeSize = 1.2 - depth * 0.25;
+  const half = cubeSize / 2;
+  s.addOpenBox(x - half, y, z - half, cubeSize, cubeSize, cubeSize, t);
+
+  if (depth >= maxDepth) return;
+
+  const rise = 2.0 - depth * 0.3;
+  const d = spread * Math.pow(0.5, depth);
+
+  const branches = [[-d, 0], [d, 0], [0, d]];
+  for (const [bx, bz] of branches) {
+    const nx = x + bx, nz = z + bz, ny = y + cubeSize + rise;
+    s.addBar(x, y + cubeSize, z, nx, ny, nz, t);
+    tree3way(s, nx, ny, nz, depth + 1, maxDepth, spread);
+  }
+}
+
+run([
+  { strategy: null, draw: container => {
+    const s = createScene(container, {
+      distance: 32, angle: 30, pitch: 18, lookAt: [0, 5, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    tree(s, 0, 0, 0, 0, 3, 4);
+  }},
+  { strategy: "Three generations, three directions", draw: container => {
+    const s = createScene(container, {
+      distance: 40, angle: 35, pitch: 22, lookAt: [0, 4, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    tree3way(s, 0, 0, 0, 0, 2, 4);
+  }},
+  { strategy: "Mute and continue", draw: container => {
+    const s = createScene(container, {
+      distance: 22, angle: 25, pitch: 15, lookAt: [0, 3, 0],
+      groundSize: 15, bg: 0xffffff,
+    });
+    // Just the trunk and two children — one generation
+    tree(s, 0, 0, 0, 0, 1, 3);
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

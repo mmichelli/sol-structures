@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 038</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#038 &mdash; Scatter</h1>
+  <p>Sixty small coloured cubes thrown into space at random positions and rotations. Semi-transparent &mdash; a frozen explosion of confetti.</p>
+  <p class="source">After Sol LeWitt &mdash; randomness within a system</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene, THREE } from './scene.js';
+import { run } from './runner.js';
+
+function rng(seed) {
+  let s = seed;
+  return () => { s ^= s << 13; s ^= s >> 17; s ^= s << 5; return (s >>> 0) / 4294967296; };
+}
+
+function scatter(scene, count, spread, seed) {
+  const r = rng(seed);
+  const geo = new THREE.BoxGeometry(1, 1, 1);
+  const colors = [0xcc2222, 0x2244cc, 0xccaa00, 0x22aa44, 0x8822cc, 0xcc7700];
+  for (let i = 0; i < count; i++) {
+    const size = 0.3 + r() * 0.7;
+    const mat = new THREE.MeshStandardMaterial({
+      color: colors[Math.floor(r() * colors.length)],
+      transparent: true, opacity: 0.3 + r() * 0.4,
+      roughness: 0.3, depthWrite: false,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.scale.setScalar(size);
+    mesh.position.set(
+      (r() - 0.5) * spread,
+      r() * spread * 0.6 + size,
+      (r() - 0.5) * spread,
+    );
+    mesh.rotation.set(r() * Math.PI, r() * Math.PI, r() * Math.PI);
+    mesh.castShadow = true;
+    scene.add(mesh);
+  }
+}
+
+run([
+  { strategy: null, draw: container => {
+    const ctx = createScene(container, {
+      distance: 28, angle: 35, pitch: 22, lookAt: [0, 4, 0],
+      groundSize: 20, bg: 0xffffff,
+    });
+    scatter(ctx.scene, 60, 12, Date.now());
+  }},
+  { strategy: "Tight cluster", draw: container => {
+    const ctx = createScene(container, {
+      distance: 20, angle: 30, pitch: 25, lookAt: [0, 3, 0],
+      groundSize: 15, bg: 0xffffff,
+    });
+    scatter(ctx.scene, 80, 6, Date.now());
+  }},
+  { strategy: "Sparse field", draw: container => {
+    const ctx = createScene(container, {
+      distance: 40, angle: 40, pitch: 18, lookAt: [0, 3, 0],
+      groundSize: 30, bg: 0xffffff,
+    });
+    scatter(ctx.scene, 40, 20, Date.now());
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

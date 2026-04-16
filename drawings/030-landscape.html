@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 030</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#030 &mdash; Landscape</h1>
+  <p>An undulating surface &mdash; a flat plane deformed by gentle waves. White terrain with no features, just the pure topology of rising and falling ground.</p>
+  <p class="source">After Sol LeWitt &mdash; <em>Complex Forms</em> and late sculptural work</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene } from './scene.js';
+import * as THREE from 'three';
+import { run } from './runner.js';
+
+function terrain(s, size, segments, amplitude, seed) {
+  const geo = new THREE.PlaneGeometry(size, size, segments, segments);
+  const pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), y = pos.getY(i);
+    const h = Math.sin(x * 0.5 + seed) * Math.cos(y * 0.7 + seed * 0.3) * amplitude
+            + Math.sin(x * 1.2 + y * 0.8 + seed) * amplitude * 0.4
+            + Math.sin(x * 2.5 - y * 1.5 + seed * 2) * amplitude * 0.15;
+    pos.setZ(i, Math.max(0, h));
+  }
+  geo.computeVertexNormals();
+  const mesh = new THREE.Mesh(geo, s.whiteMat);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  s.scene.add(mesh);
+}
+
+run([
+  { strategy: null, draw: container => {
+    const s = createScene(container, {
+      distance: 40, angle: 40, pitch: 30, lookY: 1, lookAt: [0, 1, 0],
+      groundSize: 30, bg: 0xffffff,
+    });
+    terrain(s, 16, 60, 2.5, Math.random() * 100);
+  }},
+  { strategy: "More agitated", draw: container => {
+    const s = createScene(container, {
+      distance: 40, angle: 40, pitch: 30, lookY: 2, lookAt: [0, 2, 0],
+      groundSize: 30, bg: 0xffffff,
+    });
+    terrain(s, 16, 80, 4, Math.random() * 100);
+  }},
+  { strategy: "Minimal", draw: container => {
+    const s = createScene(container, {
+      distance: 40, angle: 35, pitch: 25, lookY: 0.5, lookAt: [0, 0.5, 0],
+      groundSize: 30, bg: 0xffffff,
+    });
+    terrain(s, 20, 40, 1, Math.random() * 100);
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

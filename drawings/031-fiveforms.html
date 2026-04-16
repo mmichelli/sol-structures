@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure 031</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#031 &mdash; Five Open Geometric Structures</h1>
+  <p>Five different open geometric forms standing in a row: cube, tetrahedron, octahedron, prism, and an irregular solid. Each rendered as edges only.</p>
+  <p class="source">After Sol LeWitt &mdash; <em>Five Open Geometric Structures</em>, 1979</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene } from './scene.js';
+import * as THREE from 'three';
+import { run } from './runner.js';
+
+function wireform(s, geo, ox, oy, oz, scale) {
+  const edges = new THREE.EdgesGeometry(geo);
+  const mat = new THREE.LineBasicMaterial({ color: 0x555555, linewidth: 1 });
+  const wire = new THREE.LineSegments(edges, mat);
+  wire.position.set(ox, oy, oz);
+  wire.scale.setScalar(scale);
+  s.scene.add(wire);
+}
+
+run([
+  { strategy: null, draw: container => {
+    const s = createScene(container, {
+      distance: 45, angle: 35, pitch: 20, lookY: 2, lookAt: [0, 2, 0],
+      groundSize: 25, bg: 0xffffff,
+    });
+    const sp = 5;
+    wireform(s, new THREE.BoxGeometry(1,1,1), -2*sp, 2, 0, 3);
+    wireform(s, new THREE.TetrahedronGeometry(1), -sp, 2, 0, 3);
+    wireform(s, new THREE.OctahedronGeometry(1), 0, 2, 0, 3);
+    wireform(s, new THREE.CylinderGeometry(0, 1, 1.5, 4), sp, 2, 0, 3);
+    wireform(s, new THREE.DodecahedronGeometry(1), 2*sp, 2, 0, 3);
+  }},
+  { strategy: "Scale them", draw: container => {
+    const s = createScene(container, {
+      distance: 50, angle: 35, pitch: 22, lookY: 2.5, lookAt: [0, 2.5, 0],
+      groundSize: 30, bg: 0xffffff,
+    });
+    const geos = [
+      new THREE.BoxGeometry(1,1,1),
+      new THREE.TetrahedronGeometry(1),
+      new THREE.OctahedronGeometry(1),
+      new THREE.CylinderGeometry(0, 1, 1.5, 4),
+      new THREE.DodecahedronGeometry(1),
+    ];
+    for (let i = 0; i < 5; i++) {
+      const sc = 1.5 + i * 1;
+      wireform(s, geos[i], (i-2)*6, sc, 0, sc);
+    }
+  }},
+  { strategy: "Solids, not lines", draw: container => {
+    const s = createScene(container, {
+      distance: 45, angle: 35, pitch: 22, lookY: 2, lookAt: [0, 2, 0],
+      groundSize: 25, bg: 0xffffff,
+    });
+    const sp = 5;
+    const geos = [
+      new THREE.BoxGeometry(3,3,3),
+      new THREE.TetrahedronGeometry(2),
+      new THREE.OctahedronGeometry(2),
+      new THREE.ConeGeometry(2, 3, 4),
+      new THREE.DodecahedronGeometry(2),
+    ];
+    geos.forEach((geo, i) => {
+      const mesh = new THREE.Mesh(geo, s.whiteMat);
+      mesh.position.set((i-2)*sp, 2, 0);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      s.scene.add(mesh);
+    });
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>
