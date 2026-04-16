@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cube Study 007</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="card">
+  <h1>#007 &mdash; Pyramid</h1>
+  <p>A stepped pyramid: the bottom layer nine-by-nine, each successive layer shrinking by two on each side, rising to a single cube at the peak.</p>
+  <p class="source">After Sol LeWitt &mdash; pyramidal structures</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene, render } from './cube.js';
+import { run } from './runner.js';
+
+function layerStyle(grey) {
+  return {
+    default: { fill: `rgb(${grey},${grey},${grey})`, stroke: '#999', strokeWidth: 0.5 },
+    top:     { fill: `rgb(${grey+25},${grey+25},${grey+25})` },
+    front:   { fill: `rgb(${grey-10},${grey-10},${grey-10})` },
+    left:    { fill: `rgb(${grey-25},${grey-25},${grey-25})` },
+  };
+}
+
+run([
+  { strategy: null, draw: container => {
+    const h = createScene({ tile: 12, camera: { type: 'isometric', angle: 45 } });
+    const layers = 5;
+    for (let i = 0; i < layers; i++) {
+      const n = (layers - i) * 2 - 1;
+      h.addGeometry({ type: 'box', position: [i, layers - 1 - i, i], size: [n, 1, n], style: layerStyle(Math.round(120 + i * 25)) });
+    }
+    render(container, h);
+  }},
+  { strategy: "Only one element of each kind", draw: container => {
+    const h = createScene({ tile: 12, camera: { type: 'isometric', angle: 45 } });
+    // Stepped staircase instead of centred pyramid
+    const steps = 7;
+    for (let i = 0; i < steps; i++) {
+      const w = steps - i;
+      h.addGeometry({ type: 'box', position: [0, steps - 1 - i, i], size: [w, 1, 1], style: layerStyle(Math.round(110 + i * 18)) });
+    }
+    render(container, h);
+  }},
+  { strategy: "Water", draw: container => {
+    const h = createScene({ tile: 12, camera: { type: 'isometric', angle: 45 } });
+    // Inverted pyramid — pool
+    const layers = 5;
+    for (let i = 0; i < layers; i++) {
+      const n = (i + 1) * 2 - 1;
+      const off = layers - 1 - i;
+      h.addGeometry({ type: 'box', position: [off, layers - 1 - i, off], size: [n, 1, n], style: layerStyle(Math.round(120 + i * 25)) });
+    }
+    render(container, h);
+  }},
+]);
+</script>
+</body>
+</html>

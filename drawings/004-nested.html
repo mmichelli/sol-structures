@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cube Study 004</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="card">
+  <h1>#004 &mdash; Nested</h1>
+  <p>A large hollow cube containing a smaller hollow cube, containing a solid cube at the centre. A corner is cut away to reveal the shells within.</p>
+  <p class="source">After Sol LeWitt &mdash; cube within a cube</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene, render } from './cube.js';
+import { run } from './runner.js';
+
+const outer = { default: { fill: '#d4d4d4', stroke: '#999', strokeWidth: 0.5 }, top: { fill: '#e8e8e8' }, front: { fill: '#c0c0c0' }, left: { fill: '#a8a8a8' } };
+const mid   = { default: { fill: '#c0c0c0', stroke: '#888', strokeWidth: 0.5 }, top: { fill: '#d8d8d8' }, front: { fill: '#aaa' }, left: { fill: '#999' } };
+const inner = { default: { fill: '#999', stroke: '#666', strokeWidth: 0.5 }, top: { fill: '#bbb' }, front: { fill: '#888' }, left: { fill: '#777' } };
+
+run([
+  { strategy: null, draw: container => {
+    const h = createScene({ tile: 10, camera: { type: 'isometric', angle: 45 } });
+    h.addGeometry({ type: 'box', position: [0, 0, 0], size: 13, style: outer });
+    h.removeGeometry({ type: 'box', position: [1, 1, 1], size: 11 });
+    h.addGeometry({ type: 'box', position: [3, 3, 3], size: 7, style: mid });
+    h.removeGeometry({ type: 'box', position: [4, 4, 4], size: 5 });
+    h.addGeometry({ type: 'box', position: [5, 5, 5], size: 3, style: inner });
+    h.removeGeometry({ type: 'box', position: [0, 0, 0], size: [6, 6, 6] });
+    render(container, h);
+  }},
+  { strategy: "Turn it upside down", draw: container => {
+    const h = createScene({ tile: 10, camera: { type: 'isometric', angle: 225 } });
+    h.addGeometry({ type: 'box', position: [0, 0, 0], size: 13, style: outer });
+    h.removeGeometry({ type: 'box', position: [1, 1, 1], size: 11 });
+    h.addGeometry({ type: 'box', position: [3, 3, 3], size: 7, style: mid });
+    h.removeGeometry({ type: 'box', position: [4, 4, 4], size: 5 });
+    h.addGeometry({ type: 'box', position: [5, 5, 5], size: 3, style: inner });
+    h.removeGeometry({ type: 'box', position: [7, 7, 7], size: [6, 6, 6] });
+    render(container, h);
+  }},
+  { strategy: "Destroy — nothing — destroy", draw: container => {
+    const h = createScene({ tile: 10, camera: { type: 'isometric', angle: 45 } });
+    h.addGeometry({ type: 'box', position: [0, 0, 0], size: 13, style: outer });
+    h.removeGeometry({ type: 'box', position: [1, 1, 1], size: 11 });
+    h.addGeometry({ type: 'box', position: [3, 3, 3], size: 7, style: mid });
+    h.removeGeometry({ type: 'box', position: [4, 4, 4], size: 5 });
+    h.addGeometry({ type: 'box', position: [5, 5, 5], size: 3, style: inner });
+    // Cut two opposing corners
+    h.removeGeometry({ type: 'box', position: [0, 0, 0], size: [6, 6, 6] });
+    h.removeGeometry({ type: 'box', position: [7, 7, 7], size: [6, 6, 6] });
+    render(container, h);
+  }},
+]);
+</script>
+</body>
+</html>

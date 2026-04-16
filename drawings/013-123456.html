@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cube Study 013</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="card">
+  <h1>#013 &mdash; 1 2 3 4 5 6</h1>
+  <p>A stepped tower of open cubes. The bottom layer six wide and six tall; each layer shrinks by one, rising to a single cube at the peak.</p>
+  <p class="source">After Sol LeWitt &mdash; <em>1 2 3 4 5 6</em>, 1978</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { isoSVG } from './iso.js';
+import { run } from './runner.js';
+
+function steppedTower(iso, steps, s, ox, oy, oz, style) {
+  for (let step = 0; step < steps; step++) {
+    const n = steps - step;
+    for (let x = 0; x < n; x++)
+      for (let y = 0; y < n; y++)
+        iso.addOpenCube(ox + x * s, oy + (step * n + y) * s - step * s + step * s, oz, s, style);
+  }
+}
+
+// Flat stepped staircase (like the photo)
+function staircase(iso, steps, s, style) {
+  for (let step = 0; step < steps; step++) {
+    const n = steps - step;
+    const baseY = step * s;
+    for (let x = 0; x < n; x++)
+      for (let y = 0; y < n; y++)
+        iso.addOpenCube(x * s, baseY + y * s, 0, s, style);
+  }
+}
+
+run([
+  { strategy: null, draw: container => {
+    const iso = isoSVG({ scale: 14, stroke: '#444', strokeWidth: 0.8 });
+    staircase(iso, 6, 1.2);
+    iso.render(container);
+  }},
+  { strategy: "Repetition is a form of change", draw: container => {
+    const iso = isoSVG({ scale: 10, stroke: '#444', strokeWidth: 0.7 });
+    // Two mirrored staircases
+    staircase(iso, 6, 1.2);
+    // Second one offset and mirrored — built from the other side
+    const s = 1.2, steps = 6;
+    for (let step = 0; step < steps; step++) {
+      const n = steps - step;
+      for (let x = 0; x < n; x++)
+        for (let y = 0; y < n; y++)
+          iso.addOpenCube((steps - 1 - x) * s + steps * s + 3, step * s + y * s, 0, s);
+    }
+    iso.render(container);
+  }},
+  { strategy: "Make it more sensual", draw: container => {
+    // Deep — each step also has depth
+    const iso = isoSVG({ scale: 10, stroke: '#444', strokeWidth: 0.6 });
+    const s = 1.2, steps = 5;
+    for (let step = 0; step < steps; step++) {
+      const n = steps - step;
+      for (let x = 0; x < n; x++)
+        for (let y = 0; y < n; y++)
+          for (let z = 0; z < 1; z++)
+            iso.addOpenCube(x * s, step * s + y * s, z * s, s);
+    }
+    iso.render(container);
+  }},
+  { strategy: "Turn it upside down", draw: container => {
+    // Inverted staircase — widest at top
+    const iso = isoSVG({ scale: 14, stroke: '#444', strokeWidth: 0.8 });
+    const s = 1.2, steps = 6;
+    for (let step = 0; step < steps; step++) {
+      const n = step + 1;
+      for (let x = 0; x < n; x++)
+        for (let y = 0; y < n; y++)
+          iso.addOpenCube(x * s, step * s + y * s, 0, s);
+    }
+    iso.render(container);
+  }},
+]);
+</script>
+</body>
+</html>

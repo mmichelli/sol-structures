@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cube Study 015</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#015 &mdash; Nine-Part Modular Cube</h1>
+  <p>A three-by-three-by-three lattice of open cubes forming one large cube. White painted aluminum, the 1:8.5 bar-to-void ratio.</p>
+  <p class="source">After Sol LeWitt &mdash; <em>Nine-Part Modular Cube</em>, 1977</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene } from './scene.js';
+import { run } from './runner.js';
+
+function lattice(s, N, unit, bar) {
+  for (let x = 0; x < N; x++)
+    for (let y = 0; y < N; y++)
+      for (let z = 0; z < N; z++)
+        s.addOpenCube(
+          x * unit - (N * unit) / 2,
+          y * unit,
+          z * unit - (N * unit) / 2,
+          unit, bar
+        );
+}
+
+run([
+  { strategy: null, draw: container => {
+    const s = createScene(container, {
+      distance: 45, angle: 35, pitch: 25, lookY: 3, lookAt: [0, 3, 0],
+      groundSize: 16, gridDivisions: 16, bg: 0xffffff,
+    });
+    lattice(s, 3, 2.2, 0.1);
+  }},
+  { strategy: "Double Modular Cube", draw: container => {
+    const s = createScene(container, {
+      distance: 55, angle: 35, pitch: 25, lookY: 5, lookAt: [0, 5, 0],
+      groundSize: 16, gridDivisions: 16, bg: 0xffffff,
+    });
+    // Two cubes stacked
+    const u = 2.2, b = 0.1, N = 3;
+    for (let x = 0; x < N; x++)
+      for (let y = 0; y < N * 2; y++)
+        for (let z = 0; z < N; z++)
+          s.addOpenCube(x*u - N*u/2, y*u, z*u - N*u/2, u, b);
+  }},
+  { strategy: "Two Open Modular Cubes/Half-Off", draw: container => {
+    const s = createScene(container, {
+      distance: 50, angle: 35, pitch: 25, lookY: 3, lookAt: [0, 3, 0],
+      groundSize: 20, gridDivisions: 20, bg: 0xffffff,
+    });
+    const u = 2, b = 0.08, N = 3;
+    // First cube
+    for (let x = 0; x < N; x++)
+      for (let y = 0; y < N; y++)
+        for (let z = 0; z < N; z++)
+          s.addOpenCube(x*u - N*u/2, y*u, z*u - N*u/2, u, b);
+    // Second cube offset by half a unit
+    for (let x = 0; x < N; x++)
+      for (let y = 0; y < N; y++)
+        for (let z = 0; z < N; z++)
+          s.addOpenCube(x*u - N*u/2 + u/2, y*u + u/2, z*u - N*u/2 + u/2, u, b);
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

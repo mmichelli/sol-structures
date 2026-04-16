@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cube Study 016</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#016 &mdash; Incomplete</h1>
+  <p>A single large incomplete open cube. White painted bars casting shadows on the ground. Click to see another variation.</p>
+  <p class="source">After Sol LeWitt &mdash; <em>Variations of Incomplete Open Cubes</em>, 1974</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene } from './scene.js';
+import { run } from './runner.js';
+
+// Enumerate some incomplete open cubes
+const E = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+const V = [[0,0,0],[1,0,0],[1,0,1],[0,0,1],[0,1,0],[1,1,0],[1,1,1],[0,1,1]];
+const ADJ = (() => {
+  const a=Array.from({length:12},()=>[]);
+  for(let i=0;i<12;i++)for(let j=i+1;j<12;j++){const[a1,b1]=E[i],[a2,b2]=E[j];if(a1===a2||a1===b2||b1===a2||b1===b2){a[i].push(j);a[j].push(i);}}
+  return a;
+})();
+function isConn(edges){if(edges.length<=1)return true;const s=new Set(edges),v=new Set([edges[0]]),q=[edges[0]];while(q.length){const c=q.shift();for(const n of ADJ[c])if(s.has(n)&&!v.has(n)){v.add(n);q.push(n);}}return v.size===s.size;}
+
+// Pick random valid incomplete cube with N edges
+function randomIncomplete(n) {
+  for (let tries = 0; tries < 5000; tries++) {
+    const pool = [...Array(12).keys()];
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+    const edges = pool.slice(0, n);
+    if (isConn(edges)) return edges;
+  }
+  return [0, 3, 8]; // fallback: corner
+}
+
+function buildEdges(s, edges, size) {
+  const bar = 0.12;
+  const hoff = -size / 2; // center horizontally only
+  for (const ei of edges) {
+    const [a, b] = E[ei];
+    const [x1,y1,z1] = [V[a][0]*size + hoff, V[a][1]*size, V[a][2]*size + hoff];
+    const [x2,y2,z2] = [V[b][0]*size + hoff, V[b][1]*size, V[b][2]*size + hoff];
+    s.addBar(x1, y1, z1, x2, y2, z2, bar);
+  }
+}
+
+run([
+  { strategy: null, draw: container => {
+    const s = createScene(container, {
+      distance: 45, angle: 40, pitch: 25, lookY: 2.5, lookAt: [0, 2.5, 0],
+      groundSize: 16, gridDivisions: 16, bg: 0xffffff,
+    });
+    buildEdges(s, randomIncomplete(5 + Math.floor(Math.random() * 4)), 5);
+  }},
+  { strategy: "Three edges — the minimal corner", draw: container => {
+    const s = createScene(container, {
+      distance: 45, angle: 40, pitch: 25, lookY: 2.5, lookAt: [0, 2.5, 0],
+      groundSize: 16, gridDivisions: 16, bg: 0xffffff,
+    });
+    buildEdges(s, [0, 3, 8], 5);
+  }},
+  { strategy: "Eleven edges — one missing", draw: container => {
+    const s = createScene(container, {
+      distance: 45, angle: 40, pitch: 25, lookY: 2.5, lookAt: [0, 2.5, 0],
+      groundSize: 16, gridDivisions: 16, bg: 0xffffff,
+    });
+    const missing = Math.floor(Math.random() * 12);
+    const edges = [...Array(12).keys()].filter(i => i !== missing);
+    buildEdges(s, edges, 5);
+  }},
+  { strategy: "Five Open Geometric Structures", draw: container => {
+    const s = createScene(container, {
+      distance: 50, angle: 35, pitch: 22, lookY: 2, lookAt: [0, 2, 0],
+      groundSize: 20, gridDivisions: 20, bg: 0xffffff,
+    });
+    // Five different incomplete cubes in a row
+    for (let i = 0; i < 5; i++) {
+      const n = 3 + i * 2; // 3, 5, 7, 9, 11 edges
+      const edges = randomIncomplete(n);
+      const off = (i - 2) * 5;
+      const bar = 0.1;
+      for (const ei of edges) {
+        const [a, b] = E[ei];
+        const [x1,y1,z1] = [V[a][0]*3 + off, V[a][1]*3, V[a][2]*3];
+        const [x2,y2,z2] = [V[b][0]*3 + off, V[b][1]*3, V[b][2]*3];
+        s.addBar(x1, y1, z1, x2, y2, z2, bar);
+      }
+    }
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

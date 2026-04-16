@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cube Study 011</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="card">
+  <h1>#011 &mdash; Lattice</h1>
+  <p>A three-by-three-by-three lattice of open cubes sharing edges. Every interior line visible through every face.</p>
+  <p class="source">After Sol LeWitt &mdash; <em>Modular Cube</em>, 1966</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { isoSVG } from './iso.js';
+import { run } from './runner.js';
+
+function drawLattice(iso, N, s, ox, oy, oz, style) {
+  for (let x = 0; x < N; x++)
+    for (let y = 0; y < N; y++)
+      for (let z = 0; z < N; z++)
+        iso.addOpenCube(ox + x * s, oy + y * s, oz + z * s, s, style);
+}
+
+run([
+  { strategy: null, draw: container => {
+    const iso = isoSVG({ scale: 28, stroke: '#444', strokeWidth: 1 });
+    drawLattice(iso, 3, 2, 0, 0, 0);
+    iso.render(container);
+  }},
+  { strategy: "Take away the elements in order of apparent non-importance", draw: container => {
+    const iso = isoSVG({ scale: 28, stroke: '#444', strokeWidth: 1 });
+    const N = 3, s = 2;
+    for (let x = 0; x < N; x++)
+      for (let y = 0; y < N; y++)
+        for (let z = 0; z < N; z++)
+          if (Math.random() > 0.3) iso.addOpenCube(x*s, y*s, z*s, s);
+    iso.render(container);
+  }},
+  { strategy: "Change instrument roles", draw: container => {
+    const iso = isoSVG({ scale: 28, strokeWidth: 1 });
+    const N = 3, s = 2;
+    for (let x = 0; x < N; x++)
+      for (let y = 0; y < N; y++)
+        for (let z = 0; z < N; z++) {
+          // Vary weight by depth
+          const depth = x + z;
+          const w = 0.5 + depth * 0.3;
+          iso.addOpenCube(x*s, y*s, z*s, s, { stroke: '#444', strokeWidth: w });
+        }
+    iso.render(container);
+  }},
+  { strategy: "1 2 3 4 5", draw: container => {
+    const iso = isoSVG({ scale: 16, stroke: '#444', strokeWidth: 0.8 });
+    // Progressive lattices: 1x1, 2x2, 3x3, 4x4
+    let ox = 0;
+    for (let n = 1; n <= 4; n++) {
+      drawLattice(iso, n, 1.5, ox, 0, 0);
+      ox += n * 1.5 + 2;
+    }
+    iso.render(container);
+  }},
+]);
+</script>
+</body>
+</html>

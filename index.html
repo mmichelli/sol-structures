@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sol structures</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+  body { margin: 0; background: #f6f5f0; font-family: ui-monospace, monospace; color: #111; }
+  header { padding: 20px 24px; border-bottom: 1px solid #ddd; display: flex; gap: 6px 16px; align-items: baseline; flex-wrap: wrap; }
+  h1 { margin: 0; font-size: 18px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .sub { color: #666; font-size: 13px; }
+  .sub a { color: #666; }
+  .sub a:hover { color: #111; }
+  .refs { flex-basis: 100%; font-size: 11px; color: #888; margin-top: 4px; }
+  .refs a { color: #888; }
+  .refs a:hover { color: #111; }
+  main { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; padding: 24px; }
+  .card { background: #fff; border: 1px solid #ddd; display: flex; flex-direction: column; text-decoration: none; color: inherit; }
+  .card:hover { border-color: #888; }
+  .preview { aspect-ratio: 1/1; border: 0; border-bottom: 1px solid #eee; background: #fff; width: 100%; display: block; }
+  .meta { padding: 12px 14px; }
+  .t { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; margin-bottom: 6px; }
+  .i { font-size: 13px; line-height: 1.5; color: #333; }
+  @media (max-width: 600px) {
+    h1 { font-size: 20px; }
+    .sub { font-size: 15px; }
+    .refs { font-size: 13px; }
+    .t { font-size: 13px; }
+    .i { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>sol structures</h1>
+  <span class="sub">After <a href="https://en.wikipedia.org/wiki/Sol_LeWitt" target="_blank" rel="noopener">Sol LeWitt</a></span>
+  <div class="refs">
+    rendered with <a href="https://github.com/meodai/heerich" target="_blank" rel="noopener">heerich.js</a>
+    &middot; <a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
+    &middot; SVG
+    &middot; <a href="https://github.com/mmichelli/sol-structures" target="_blank" rel="noopener">source</a>
+  </div>
+</header>
+<main id="grid"></main>
+
+<script>
+const drawings = [
+  { num: '001', file: 'drawings/001-serial.html',
+    title: 'Serial',
+    instruction: 'A three-by-three grid of solid blocks, each block\u2019s height increasing systematically from one to nine units.' },
+  { num: '002', file: 'drawings/002-incomplete.html',
+    title: 'Incomplete',
+    instruction: 'A four-by-four grid of cubes, each with a different piece subtracted \u2014 a corner, a column, a slot, a void.' },
+  { num: '003', file: 'drawings/003-modular.html',
+    title: 'Modular',
+    instruction: 'A five-by-five-by-five lattice of open wireframe cubes stacked to form a single large cube.' },
+  { num: '004', file: 'drawings/004-nested.html',
+    title: 'Nested',
+    instruction: 'Three concentric hollow cubes with a corner cut away, revealing the shells within.' },
+  { num: '005', file: 'drawings/005-tower.html',
+    title: 'Tower',
+    instruction: 'A stack of twelve solid cubes, each offset from the one below, forming a twisting tower that lightens as it ascends.' },
+  { num: '006', file: 'drawings/006-wall.html',
+    title: 'Wall',
+    instruction: 'A flat wall of seven-by-seven solid cubes with random cubes removed, leaving gaps and voids.' },
+  { num: '007', file: 'drawings/007-staircase.html',
+    title: 'Staircase',
+    instruction: 'A stepped pyramid: five-by-five at the base, narrowing by one layer to a single cube at the peak.' },
+  { num: '008', file: 'drawings/008-color.html',
+    title: 'Colour',
+    instruction: 'A four-by-four grid of solid cubes in red, yellow, blue, and black \u2014 no two adjacent cubes the same colour.' },
+  { num: '009', file: 'drawings/009-open.html',
+    title: 'Open',
+    instruction: 'An open cube drawn in thin bars \u2014 twelve edges, no faces. A line drawing in three dimensions.' },
+  { num: '010', file: 'drawings/010-incomplete.html',
+    title: 'Incomplete',
+    instruction: 'Twelve variations of the incomplete open cube: each shows a different connected subset of the twelve edges.' },
+  { num: '011', file: 'drawings/011-lattice.html',
+    title: 'Lattice',
+    instruction: 'A three-by-three-by-three lattice of open cubes sharing edges. Transparent \u2014 every interior line visible.' },
+  { num: '012', file: 'drawings/012-progression.html',
+    title: 'Progression',
+    instruction: 'Six open cubes in a row, each larger than the last: one through six units per side.' },
+  { num: '013', file: 'drawings/013-123456.html',
+    title: '1 2 3 4 5 6',
+    instruction: 'A stepped tower of open cubes. Each layer shrinks by one, rising to a single cube at the peak.' },
+  { num: '014', file: 'drawings/014-serial.html',
+    title: 'Serial Project',
+    instruction: 'A three-by-three grid of forms on a platform, varying on two properties: open or closed, tall or short.' },
+  { num: '015', file: 'drawings/015-modular3d.html',
+    title: 'Nine-Part Modular Cube',
+    instruction: 'A 3\u00d73\u00d73 lattice of open cubes. White bars, shadows on the ground.' },
+  { num: '016', file: 'drawings/016-incomplete3d.html',
+    title: 'Incomplete',
+    instruction: 'A single large incomplete open cube. White bars casting shadows. Click for another variation.' },
+  { num: '017', file: 'drawings/017-incomplete-gallery.html',
+    title: 'Incomplete Gallery',
+    instruction: 'Incomplete open cubes arranged on a platform. Each a different connected edge subset.' },
+];
+
+const grid = document.getElementById('grid');
+for (const d of drawings) {
+  const a = document.createElement('a');
+  a.className = 'card';
+  a.href = d.file;
+  a.innerHTML =
+    '<img class="preview" src="previews/' + d.num + '.png" alt="Cube Study ' + d.num + '" loading="lazy">' +
+    '<div class="meta">' +
+      '<div class="t">#' + d.num + ' \u2014 ' + d.title + '</div>' +
+      '<div class="i">' + d.instruction + '</div>' +
+    '</div>';
+  grid.appendChild(a);
+}
+</script>
+</body>
+</html>

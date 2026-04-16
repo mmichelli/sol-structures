@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cube Study 009</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="card">
+  <h1>#009 &mdash; Open</h1>
+  <p>A single open cube &mdash; twelve edges, no faces. The cube presented as purely as possible: a line drawing in three dimensions.</p>
+  <p class="source">After Sol LeWitt &mdash; open cube structures</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { isoSVG } from './iso.js';
+import { run } from './runner.js';
+
+run([
+  { strategy: null, draw: container => {
+    const iso = isoSVG({ scale: 60, stroke: '#333', strokeWidth: 1.8 });
+    iso.addOpenCube(0, 0, 0, 4);
+    iso.render(container);
+  }},
+  { strategy: "Simple subtraction", draw: container => {
+    const iso = isoSVG({ scale: 40, stroke: '#333', strokeWidth: 1.5 });
+    iso.addOpenCube(0, 0, 0, 6);
+    iso.addOpenCube(1.5, 1.5, 1.5, 3, { stroke: '#999', strokeWidth: 1 });
+    iso.render(container);
+  }},
+  { strategy: "Cascades", draw: container => {
+    const iso = isoSVG({ scale: 30, stroke: '#333', strokeWidth: 1.4 });
+    iso.addOpenCube(0, 0, 0, 8);
+    iso.addOpenCube(2, 2, 2, 4, { stroke: '#666', strokeWidth: 1.1 });
+    iso.addOpenCube(3, 3, 3, 2, { stroke: '#999', strokeWidth: 0.8 });
+    iso.render(container);
+  }},
+  { strategy: "Cluster the edges", draw: container => {
+    const iso = isoSVG({ scale: 36, stroke: '#333', strokeWidth: 1.3 });
+    // 3x1 row of cubes
+    for (let i = 0; i < 3; i++) iso.addOpenCube(i * 3, 0, 0, 2.5);
+    iso.render(container);
+  }},
+]);
+</script>
+</body>
+</html>

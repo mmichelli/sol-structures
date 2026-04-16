@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cube Study 017</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#017 &mdash; Incomplete Open Cubes</h1>
+  <p id="desc">Incomplete open cubes arranged on a platform. Each is a different connected subset of the twelve edges. White painted bars casting shadows.</p>
+  <p class="source">After Sol LeWitt &mdash; <em>Variations of Incomplete Open Cubes</em>, 1974</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene } from './scene.js';
+import { run } from './runner.js';
+
+// --- Enumerate all 122 incomplete open cubes ---
+const V = [[0,0,0],[1,0,0],[1,0,1],[0,0,1],[0,1,0],[1,1,0],[1,1,1],[0,1,1]];
+const E = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+const ADJ = (() => {
+  const a=Array.from({length:12},()=>[]);
+  for(let i=0;i<12;i++)for(let j=i+1;j<12;j++){const[a1,b1]=E[i],[a2,b2]=E[j];if(a1===a2||a1===b2||b1===a2||b1===b2){a[i].push(j);a[j].push(i);}}
+  return a;
+})();
+function isConn(edges){if(edges.length<=1)return true;const s=new Set(edges),v=new Set([edges[0]]),q=[edges[0]];while(q.length){const c=q.shift();for(const n of ADJ[c])if(s.has(n)&&!v.has(n)){v.add(n);q.push(n);}}return v.size===s.size;}
+const ROTS = (() => {
+  const find=(x,y,z)=>V.findIndex(v=>Math.round(v[0])===x&&Math.round(v[1])===y&&Math.round(v[2])===z);
+  const make=fn=>V.map(([x,y,z])=>{const[a,b,c]=fn(x-.5,y-.5,z-.5);return find(Math.round(a+.5),Math.round(b+.5),Math.round(c+.5));});
+  const seen=new Set(),out=[];
+  for(let rx=0;rx<4;rx++)for(let ry=0;ry<4;ry++)for(let rz=0;rz<4;rz++){
+    const p=make((x,y,z)=>{for(let i=0;i<rx;i++){const t=y;y=-z;z=t;}for(let i=0;i<ry;i++){const t=x;x=z;z=-t;}for(let i=0;i<rz;i++){const t=x;x=-y;y=t;}return[x,y,z];});
+    const k=p.join(',');if(!seen.has(k)&&!p.includes(-1)){seen.add(k);out.push(p);}
+  }
+  return out;
+})();
+function canonical(edges){
+  let best=edges.slice().sort((a,b)=>a-b).join(',');
+  for(const p of ROTS){const r=edges.map(ei=>{const na=p[E[ei][0]],nb=p[E[ei][1]],lo=Math.min(na,nb),hi=Math.max(na,nb);return E.findIndex(([a,b])=>a===lo&&b===hi);}).sort((a,b)=>a-b).join(',');if(r<best)best=r;}
+  return best;
+}
+const ALL = (() => {
+  const seen=new Set(),out=[];
+  for(let mask=1;mask<(1<<12)-1;mask++){
+    const edges=[];for(let i=0;i<12;i++)if(mask&(1<<i))edges.push(i);
+    if(edges.length<3||edges.length>11||!isConn(edges))continue;
+    const k=canonical(edges);if(seen.has(k))continue;seen.add(k);out.push(edges);
+  }
+  out.sort((a,b)=>a.length-b.length||canonical(a).localeCompare(canonical(b)));
+  return out;
+})();
+
+function pickN(n) {
+  const step = Math.max(1, Math.floor(ALL.length / n));
+  return Array.from({length: n}, (_, i) => ALL[Math.min(i * step, ALL.length - 1)]);
+}
+function onePerCount() {
+  const g = {};
+  for (const e of ALL) { if (!g[e.length]) g[e.length] = e; }
+  return Object.values(g);
+}
+
+function buildEdges(s, edges, cubeSize, ox, oz) {
+  const bar = 0.04;
+  for (const ei of edges) {
+    const [a, b] = E[ei];
+    const [x1,y1,z1] = [V[a][0]*cubeSize + ox, V[a][1]*cubeSize, V[a][2]*cubeSize + oz];
+    const [x2,y2,z2] = [V[b][0]*cubeSize + ox, V[b][1]*cubeSize, V[b][2]*cubeSize + oz];
+    s.addBar(x1, y1, z1, x2, y2, z2, bar);
+  }
+}
+
+// Random count between 1 and 500
+const count = 1 + Math.floor(Math.random() * 500);
+const desc = document.getElementById('desc');
+if (desc) desc.textContent = count + ' incomplete open cubes arranged on a platform. Each is a connected subset of the twelve edges. White painted bars casting shadows.';
+
+function randomCube() {
+  return ALL[Math.floor(Math.random() * ALL.length)];
+}
+
+function buildGrid(container, n) {
+  const cols = Math.max(1, Math.ceil(Math.sqrt(n * 1.2)));
+  const rows = Math.ceil(n / cols);
+  const cubeSize = n > 200 ? 0.8 : n > 50 ? 1.2 : n > 10 ? 1.6 : 2.5;
+  const spacing = cubeSize + 1;
+  const extent = Math.max(cols, rows) * spacing;
+  const dist = Math.max(30, extent * 1.8);
+
+  const s = createScene(container, {
+    distance: dist, angle: 38, pitch: 35,
+    lookY: cubeSize / 2, lookAt: [0, cubeSize / 2, 0],
+    groundSize: extent + 10, bg: 0xffffff,
+  });
+
+  const offX = (cols - 1) * spacing / 2;
+  const offZ = (rows - 1) * spacing / 2;
+  const bar = n > 200 ? 0.025 : n > 50 ? 0.035 : 0.05;
+
+  for (let i = 0; i < n; i++) {
+    const col = i % cols, row = Math.floor(i / cols);
+    const edges = i < ALL.length ? ALL[i] : randomCube();
+    for (const ei of edges) {
+      const [a, b] = E[ei];
+      const [x1,y1,z1] = [V[a][0]*cubeSize + col*spacing - offX, V[a][1]*cubeSize, V[a][2]*cubeSize + row*spacing - offZ];
+      const [x2,y2,z2] = [V[b][0]*cubeSize + col*spacing - offX, V[b][1]*cubeSize, V[b][2]*cubeSize + row*spacing - offZ];
+      s.addBar(x1, y1, z1, x2, y2, z2, bar);
+    }
+  }
+}
+
+run([
+  { strategy: count + ' structures', draw: container => {
+    buildGrid(container, count);
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>

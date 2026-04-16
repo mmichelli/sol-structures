@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cube Study 001</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="card">
+  <h1>#001 &mdash; Serial</h1>
+  <p>A three-by-three grid of solid blocks. Each block&rsquo;s height increases systematically from one to nine units, read left to right, top to bottom.</p>
+  <p class="source">After Sol LeWitt &mdash; <em>Serial Project #1 (ABCD)</em>, 1966</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene, render, GREY } from './cube.js';
+import { run } from './runner.js';
+
+run([
+  { strategy: null, draw: container => {
+    const h = createScene({ tile: 18, camera: { type: 'isometric', angle: 45 } });
+    const N = 3, base = 3, sp = 5;
+    for (let row = 0; row < N; row++)
+      for (let col = 0; col < N; col++)
+        h.addGeometry({ type: 'box', position: [col * sp, 0, row * sp], size: [base, row * N + col + 1, base], style: GREY });
+    render(container, h);
+  }},
+  { strategy: "Reverse the order", draw: container => {
+    const h = createScene({ tile: 18, camera: { type: 'isometric', angle: 45 } });
+    const N = 3, base = 3, sp = 5;
+    for (let row = 0; row < N; row++)
+      for (let col = 0; col < N; col++) {
+        const idx = 9 - (row * N + col);
+        h.addGeometry({ type: 'box', position: [col * sp, 0, row * sp], size: [base, idx, base], style: GREY });
+      }
+    render(container, h);
+  }},
+  { strategy: "Use fewer notes", draw: container => {
+    const h = createScene({ tile: 18, camera: { type: 'isometric', angle: 45 } });
+    const N = 3, base = 3, sp = 5;
+    for (let row = 0; row < N; row++)
+      for (let col = 0; col < N; col++) {
+        const idx = row * N + col + 1;
+        if (idx % 2 === 0) continue;
+        h.addGeometry({ type: 'box', position: [col * sp, 0, row * sp], size: [base, idx, base], style: GREY });
+      }
+    render(container, h);
+  }},
+]);
+</script>
+</body>
+</html>

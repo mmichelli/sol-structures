@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cube Study 003</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="card">
+  <h1>#003 &mdash; Modular</h1>
+  <p>A five-by-five-by-five lattice of unit cubes with gaps between them, forming one large open cube. The space between is as present as the solid.</p>
+  <p class="source">After Sol LeWitt &mdash; <em>Modular Cube</em>, 1966</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene, render, GREY, PALETTES } from './cube.js';
+import { run } from './runner.js';
+
+run([
+  { strategy: null, draw: container => {
+    const h = createScene({ tile: 14, gap: 0.15, camera: { type: 'isometric', angle: 45 } });
+    const N = 5;
+    for (let x = 0; x < N; x++)
+      for (let y = 0; y < N; y++)
+        for (let z = 0; z < N; z++)
+          h.addGeometry({ type: 'box', position: [x * 2, y * 2, z * 2], size: 1, style: GREY });
+    render(container, h);
+  }},
+  { strategy: "Remove specifics and convert to ambiguities", draw: container => {
+    const h = createScene({ tile: 14, gap: 0.15, camera: { type: 'isometric', angle: 45 } });
+    const N = 5;
+    for (let x = 0; x < N; x++)
+      for (let y = 0; y < N; y++)
+        for (let z = 0; z < N; z++) {
+          if (Math.random() < 0.4) continue;
+          h.addGeometry({ type: 'box', position: [x * 2, y * 2, z * 2], size: 1, style: GREY });
+        }
+    render(container, h);
+  }},
+  { strategy: "Emphasize the flaws", draw: container => {
+    const h = createScene({ tile: 14, gap: 0.15, camera: { type: 'isometric', angle: 45 } });
+    const N = 5;
+    for (let x = 0; x < N; x++)
+      for (let y = 0; y < N; y++)
+        for (let z = 0; z < N; z++) {
+          const drift = (Math.random() - 0.5) * 0.6;
+          h.addGeometry({
+            type: 'box',
+            position: [x * 2 + drift, y * 2 + drift, z * 2 + drift],
+            size: 1,
+            style: GREY,
+          });
+        }
+    render(container, h);
+  }},
+]);
+</script>
+</body>
+</html>

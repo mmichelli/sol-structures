@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cube Study 005</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="card">
+  <h1>#005 &mdash; Tower</h1>
+  <p>A vertical stack of eight blocks, each shifted one unit along a rotating direction, forming a twisting column. Blocks darken toward the base.</p>
+  <p class="source">After Sol LeWitt &mdash; tower structures</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene, render } from './cube.js';
+import { run } from './runner.js';
+
+function greyStyle(grey) {
+  return {
+    default: { fill: `rgb(${grey},${grey},${grey})`, stroke: '#888', strokeWidth: 0.5 },
+    top:     { fill: `rgb(${Math.min(255,grey+20)},${Math.min(255,grey+20)},${Math.min(255,grey+20)})` },
+    front:   { fill: `rgb(${grey-15},${grey-15},${grey-15})` },
+    left:    { fill: `rgb(${grey-30},${grey-30},${grey-30})` },
+  };
+}
+
+const dirs = [[1,0],[0,1],[-1,0],[0,-1]];
+
+run([
+  { strategy: null, draw: container => {
+    const h = createScene({ tile: 18, camera: { type: 'isometric', angle: 45 } });
+    const count = 8, s = 3;
+    let cx = 0, cz = 0;
+    for (let i = 0; i < count; i++) {
+      h.addGeometry({ type: 'box', position: [cx, i * s, cz], size: s, style: greyStyle(Math.round(120 + (i / (count-1)) * 100)) });
+      const d = dirs[i % 4]; cx += d[0]; cz += d[1];
+    }
+    render(container, h);
+  }},
+  { strategy: "Repetition is a form of change", draw: container => {
+    const h = createScene({ tile: 12, camera: { type: 'isometric', angle: 45 } });
+    const count = 8, s = 3;
+    // Three towers side by side
+    for (let t = 0; t < 3; t++) {
+      let cx = t * 8, cz = 0;
+      for (let i = 0; i < count; i++) {
+        h.addGeometry({ type: 'box', position: [cx, i * s, cz], size: s, style: greyStyle(Math.round(120 + (i / (count-1)) * 100)) });
+        const d = dirs[i % 4]; cx += d[0]; cz += d[1];
+      }
+    }
+    render(container, h);
+  }},
+  { strategy: "Make it more sensual", draw: container => {
+    const h = createScene({ tile: 16, camera: { type: 'isometric', angle: 45 } });
+    const count = 10, s = 2;
+    let cx = 0, cz = 0;
+    for (let i = 0; i < count; i++) {
+      const t = i / (count - 1);
+      const size = 1.5 + t * 2.5;
+      h.addGeometry({ type: 'box', position: [cx, i * s, cz], size: [size, s, size], style: greyStyle(Math.round(120 + t * 100)) });
+      const d = dirs[i % 4]; cx += d[0]; cz += d[1];
+    }
+    render(container, h);
+  }},
+]);
+</script>
+</body>
+</html>

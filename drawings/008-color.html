@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cube Study 008</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="card">
+  <h1>#008 &mdash; Colour</h1>
+  <p>A four-by-four grid of cubes in red, yellow, blue, and black. No two adjacent cubes share the same colour; the arrangement is determined systematically.</p>
+  <p class="source">After Sol LeWitt &mdash; colour studies with four basic colours</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene, render, PALETTES, GREY } from './cube.js';
+import { run } from './runner.js';
+
+run([
+  { strategy: null, draw: container => {
+    const h = createScene({ tile: 20, camera: { type: 'isometric', angle: 45 } });
+    const N = 4, s = 2;
+    for (let row = 0; row < N; row++)
+      for (let col = 0; col < N; col++) {
+        const ci = (row * 2 + col + Math.floor(row / 2)) % 4;
+        h.addGeometry({ type: 'box', position: [col * (s+1), 0, row * (s+1)], size: s, style: PALETTES[ci] });
+      }
+    render(container, h);
+  }},
+  { strategy: "The tape is now the music", draw: container => {
+    const h = createScene({ tile: 20, camera: { type: 'isometric', angle: 45 } });
+    const N = 4, s = 2;
+    // Same grid but heights vary by colour index
+    for (let row = 0; row < N; row++)
+      for (let col = 0; col < N; col++) {
+        const ci = (row * 2 + col + Math.floor(row / 2)) % 4;
+        const height = ci + 1;
+        h.addGeometry({ type: 'box', position: [col * (s+1), 0, row * (s+1)], size: [s, height, s], style: PALETTES[ci] });
+      }
+    render(container, h);
+  }},
+  { strategy: "Abandon normal instruments", draw: container => {
+    const h = createScene({ tile: 16, camera: { type: 'isometric', angle: 45 } });
+    const N = 4, s = 2;
+    // Sphere subtractions from coloured cubes
+    for (let row = 0; row < N; row++)
+      for (let col = 0; col < N; col++) {
+        const ci = (row * 2 + col + Math.floor(row / 2)) % 4;
+        const ox = col * (s+1), oz = row * (s+1);
+        h.addGeometry({ type: 'box', position: [ox, 0, oz], size: [s, s, s], style: PALETTES[ci] });
+        h.removeGeometry({ type: 'sphere', center: [ox + 1, 1, oz + 1], radius: 0.8 });
+      }
+    render(container, h);
+  }},
+]);
+</script>
+</body>
+</html>

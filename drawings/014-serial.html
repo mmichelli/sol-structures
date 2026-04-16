@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cube Study 014</title>
+<script>if (window.self !== window.top || location.search.includes('embed')) document.documentElement.classList.add('embedded');</script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>.holder { background: #fff; }</style>
+</head>
+<body>
+<div class="card">
+  <h1>#014 &mdash; Serial Project</h1>
+  <p>A three-by-three grid on a platform. Two nested forms &mdash; outer and inner &mdash; each open or closed, each at one of three heights. The system generates all combinations; the artist merely executes.</p>
+  <p class="source">After Sol LeWitt &mdash; <em>Serial Project #1 (ABCD)</em>, 1966</p>
+  <p class="strategy" id="strategy"></p>
+</div>
+<div class="holder" id="h"></div>
+<script type="module">
+import { createScene } from './scene.js';
+import { run } from './runner.js';
+
+// Serial Project rules:
+// Outer form: 3x3 base, heights: 0 (flat), 1 (cube), 3 (tall)
+// Inner form: 1x1 base centered, heights: 0, 1, 3
+// Set A: outer OPEN, inner OPEN
+// Set B: outer OPEN, inner CLOSED
+// Set C: outer CLOSED, inner OPEN
+// Set D: outer CLOSED, inner CLOSED
+
+function buildSet(s, outerOpen, innerOpen) {
+  const unit = 1;
+  const outerBase = 3 * unit;
+  const innerBase = 1 * unit;
+  const heights = [0.1, outerBase, outerBase * 3]; // 0=flat, 1=cube, 3=tall
+  const innerHeights = [0.1, innerBase, innerBase * 3];
+  const spacing = outerBase + 1.5;
+  const bar = 0.06;
+
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < 3; col++) {
+      const ox = col * spacing - spacing;
+      const oz = row * spacing - spacing;
+      const outerH = heights[col];
+      const innerH = innerHeights[row];
+
+      // Outer form
+      if (outerOpen) {
+        if (outerH > 0.15) {
+          s.addOpenBox(ox, 0, oz, outerBase, outerH, outerBase, bar);
+        } else {
+          // Flat = just bottom frame
+          s.addBar(ox, 0, oz, ox+outerBase, 0, oz, bar);
+          s.addBar(ox+outerBase, 0, oz, ox+outerBase, 0, oz+outerBase, bar);
+          s.addBar(ox+outerBase, 0, oz+outerBase, ox, 0, oz+outerBase, bar);
+          s.addBar(ox, 0, oz+outerBase, ox, 0, oz, bar);
+        }
+      } else {
+        s.addClosedBox(ox, 0, oz, outerBase, Math.max(outerH, 0.08), outerBase);
+      }
+
+      // Inner form (centered within outer)
+      const innerOff = (outerBase - innerBase) / 2;
+      const ix = ox + innerOff;
+      const iz = oz + innerOff;
+      if (innerOpen) {
+        if (innerH > 0.15) {
+          s.addOpenBox(ix, 0, iz, innerBase, innerH, innerBase, bar * 0.7);
+        }
+        // flat inner = nothing visible (just a dot on the ground)
+      } else {
+        if (innerH > 0.05) {
+          s.addClosedBox(ix, 0, iz, innerBase, innerH, innerBase);
+        }
+      }
+    }
+  }
+}
+
+run([
+  { strategy: null, draw: container => {
+    // Set A: outer open, inner open
+    const s = createScene(container, {
+      distance: 55, angle: 40, pitch: 30, lookY: 2, lookAt: [0, 2, 0],
+      groundSize: 20, gridDivisions: 20, bg: 0xffffff,
+    });
+    buildSet(s, true, true);
+  }},
+  { strategy: "Set B — outer open, inner closed", draw: container => {
+    const s = createScene(container, {
+      distance: 55, angle: 40, pitch: 30, lookY: 2, lookAt: [0, 2, 0],
+      groundSize: 20, gridDivisions: 20, bg: 0xffffff,
+    });
+    buildSet(s, true, false);
+  }},
+  { strategy: "Set C — outer closed, inner open", draw: container => {
+    const s = createScene(container, {
+      distance: 55, angle: 40, pitch: 30, lookY: 2, lookAt: [0, 2, 0],
+      groundSize: 20, gridDivisions: 20, bg: 0xffffff,
+    });
+    buildSet(s, false, true);
+  }},
+  { strategy: "Set D — outer closed, inner closed", draw: container => {
+    const s = createScene(container, {
+      distance: 55, angle: 40, pitch: 30, lookY: 2, lookAt: [0, 2, 0],
+      groundSize: 20, gridDivisions: 20, bg: 0xffffff,
+    });
+    buildSet(s, false, false);
+  }},
+], { noClick: true });
+</script>
+</body>
+</html>
