@@ -6,28 +6,28 @@
 <title>sol structures</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <style>
-  body { margin: 0; background: #f6f5f0; font-family: ui-monospace, monospace; color: #111; }
-  header { padding: 20px 24px; border-bottom: 1px solid #ddd; display: flex; gap: 6px 16px; align-items: baseline; flex-wrap: wrap; }
-  h1 { margin: 0; font-size: 18px; letter-spacing: 0.06em; text-transform: uppercase; }
-  .sub { color: #666; font-size: 13px; }
-  .sub a { color: #666; }
-  .sub a:hover { color: #111; }
-  .refs { flex-basis: 100%; font-size: 11px; color: #888; margin-top: 4px; }
-  .refs a { color: #888; }
-  .refs a:hover { color: #111; }
-  main { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; padding: 24px; }
-  .card { background: #fff; border: 1px solid #ddd; display: flex; flex-direction: column; text-decoration: none; color: inherit; }
-  .card:hover { border-color: #888; }
-  .preview { aspect-ratio: 1/1; border: 0; border-bottom: 1px solid #eee; background: #fff; width: 100%; display: block; }
-  .meta { padding: 12px 14px; }
-  .t { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; margin-bottom: 6px; }
-  .i { font-size: 13px; line-height: 1.5; color: #333; }
+  body { margin: 0; background: #fdf6ed; font-family: "Apple Garamond", "Garamond", Times, serif; color: #1d1c1c; }
+  header { padding: 24px 28px; border-bottom: 1px solid #1d1c1c; display: flex; gap: 6px 16px; align-items: baseline; flex-wrap: wrap; }
+  h1 { margin: 0; font-size: 25.8px; letter-spacing: 0.02em; font-weight: 400; }
+  .sub { color: #1d1c1c; font-size: 15px; font-style: italic; }
+  .sub a { color: #f72d29; text-decoration: none; }
+  .sub a:hover { color: #1d1c1c; }
+  .refs { flex-basis: 100%; font-size: 13px; color: #1d1c1c; margin-top: 6px; font-style: italic; }
+  .refs a { color: #f72d29; text-decoration: none; }
+  .refs a:hover { color: #1d1c1c; }
+  main { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; padding: 28px; }
+  .card { background: #ffffff; border: 1px solid #1d1c1c; display: flex; flex-direction: column; text-decoration: none; color: inherit; transition: background 0.15s ease; }
+  .card:hover { background: #efefef; }
+  .preview { aspect-ratio: 1/1; border: 0; border-bottom: 1px solid #1d1c1c; background: #ffffff; width: 100%; display: block; }
+  .meta { padding: 16px 18px; }
+  .t { font-size: 20.64px; line-height: 1.2; font-weight: 400; margin-bottom: 8px; color: #1d1c1c; }
+  .i { font-size: 15px; line-height: 1.5; color: #1d1c1c; font-style: italic; }
   @media (max-width: 600px) {
-    h1 { font-size: 20px; }
-    .sub { font-size: 15px; }
-    .refs { font-size: 13px; }
-    .t { font-size: 13px; }
-    .i { font-size: 15px; }
+    h1 { font-size: 25.8px; }
+    .sub { font-size: 16px; }
+    .refs { font-size: 14px; }
+    .t { font-size: 20px; }
+    .i { font-size: 16px; }
   }
 </style>
 </head>
